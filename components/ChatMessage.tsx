@@ -1,5 +1,6 @@
 import { PrivmsgMessage } from "dank-twitch-irc";
-import { Image, Text } from "react-native";
+import { Image } from "react-native";
+import { Text } from "./Themed";
 import React from "react";
 
 export default function ChatMessage(props: { message: PrivmsgMessage }) {
