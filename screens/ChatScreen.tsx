@@ -1,8 +1,6 @@
 import * as React from 'react';
-import { StyleSheet, Button, TextInput, FlatList } from 'react-native';
+import { StyleSheet, Button, TextInput, FlatList, Image } from 'react-native';
 import { ChatClient, PrivmsgMessage, TwitchEmote } from "dank-twitch-irc";
-import reactStringReplace from "react-string-replace";
-import AutoHeightImage from 'react-native-auto-height-image';
 
 import { Text, View } from '../components/Themed';
 
@@ -17,6 +15,15 @@ interface IState {
 
 function ChatMessage(props: { message: PrivmsgMessage }) {
     const msg = props.message;
+    const renderMessage = [];
+
+    const renderTwitchEmote = (index: number, id: string) => <Image
+        key={index}
+        style={styles.emote}
+        source={{
+            uri: `https://static-cdn.jtvnw.net/emoticons/v1/${id}/1.0`,
+        }}
+    />;
 
     const replacements: Array<TwitchEmote> = [];
 
@@ -24,24 +31,31 @@ function ChatMessage(props: { message: PrivmsgMessage }) {
         replacements.push({ ...emote, endIndex: emote.endIndex + 1 });
     }
 
-    const func = (match: string, index: number, offset: number) => {
-        for (const replacement of replacements) {
-            if (replacement.startIndex === offset) {
-                return <AutoHeightImage
-                    key={index}
-                    width={28}
-                    source={{
-                        uri: `https://static-cdn.jtvnw.net/emoticons/v1/${replacement.id}/1.0`,
-                    }}
-                />
+    replacements.sort((a, b) => {
+        if (a.startIndex > b.endIndex) {
+            return -1;
+        }
+        if (a.startIndex < b.endIndex) {
+            return 1;
+        }
+        return 0;
+    });
+
+    let replaced = false;
+    for (var x = 0, c = ''; c = msg.messageText.charAt(x); x++) {
+        replaced = false;
+        for (const emote of replacements) {
+            if (emote.startIndex === x) {
+                replaced = true;
+                renderMessage.push(renderTwitchEmote(x, emote.id));
+                x += emote.endIndex - emote.startIndex - 1;
             }
         }
 
-        return match;
-    };
-
-    const codes = replacements.map(emote => emote.code.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
-    const renderMessage = reactStringReplace(msg.messageText, new RegExp(`(${codes})`, "g"), func);
+        if (!replaced) {
+            renderMessage.push(c);
+        }
+    }
 
     return (
         <Text style={styles.chatMessage}><b style={{ color: props.message.colorRaw }}>{props.message.displayName}</b>: {renderMessage}</Text>
@@ -127,6 +141,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     emote: {
+        width: 28,
+        height: 28,
     },
     scrollView: {
         width: "100%",
