@@ -25,26 +25,10 @@ function ChatMessage(props: { message: PrivmsgMessage }) {
         }}
     />;
 
-    const replacements: Array<TwitchEmote> = [];
-
-    for (const emote of msg.emotes) {
-        replacements.push({ ...emote, endIndex: emote.endIndex + 1 });
-    }
-
-    replacements.sort((a, b) => {
-        if (a.startIndex > b.endIndex) {
-            return -1;
-        }
-        if (a.startIndex < b.endIndex) {
-            return 1;
-        }
-        return 0;
-    });
-
-    let replaced = false;
+    let replaced;
     for (var x = 0, c = ''; c = msg.messageText.charAt(x); x++) {
         replaced = false;
-        for (const emote of replacements) {
+        for (const emote of msg.emotes) {
             if (emote.startIndex === x) {
                 replaced = true;
                 renderMessage.push(renderTwitchEmote(x, emote.id));
