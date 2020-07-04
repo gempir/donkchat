@@ -1,8 +1,10 @@
+import AsyncStorage from '@react-native-community/async-storage';
+import { ChatClient, PrivmsgMessage } from "dank-twitch-irc";
 import * as React from 'react';
-import { StyleSheet, Button, TextInput, FlatList, Image } from 'react-native';
-import { ChatClient, PrivmsgMessage, TwitchEmote } from "dank-twitch-irc";
-
-import { Text, View } from '../components/Themed';
+import { Button, FlatList, StyleSheet, TextInput } from 'react-native';
+import { View } from '../components/Themed';
+import ChatMessage from '../components/ChatMessage';
+import Toast, { DURATION } from 'react-native-easy-toast'
 
 interface IProps {
 }
@@ -13,39 +15,6 @@ interface IState {
     addChannel: string;
 }
 
-function ChatMessage(props: { message: PrivmsgMessage }) {
-    const msg = props.message;
-    const renderMessage = [];
-
-    const renderTwitchEmote = (index: number, id: string) => <Image
-        key={index}
-        style={styles.emote}
-        source={{
-            uri: `https://static-cdn.jtvnw.net/emoticons/v1/${id}/1.0`,
-        }}
-    />;
-
-    let replaced;
-    for (var x = 0, c = ''; c = msg.messageText.charAt(x); x++) {
-        replaced = false;
-        for (const emote of msg.emotes) {
-            if (emote.startIndex === x) {
-                replaced = true;
-                renderMessage.push(renderTwitchEmote(x, emote.id));
-                x += emote.endIndex - emote.startIndex - 1;
-            }
-        }
-
-        if (!replaced) {
-            renderMessage.push(c);
-        }
-    }
-
-    return (
-        <Text style={styles.chatMessage}><b style={{ color: props.message.colorRaw }}>{props.message.displayName}</b>: {renderMessage}</Text>
-    );
-}
-
 export default class ChatScreen extends React.Component<IProps, IState> {
     state = {
         channels: [],
@@ -54,19 +23,21 @@ export default class ChatScreen extends React.Component<IProps, IState> {
     }
 
     messageBuffer: number = 200;
+    toast: React.RefObject<any> = React.createRef();
 
     client: ChatClient;
 
     constructor(props: object) {
         super(props);
 
-
         this.client = new ChatClient({ connection: { type: "websocket", secure: true } });
+    }
 
-        this.client.on("ready", () => console.log("Successfully connected to chat"));
+    componentDidMount() {
+        this.client.on("ready", () => this.toast.current.show("connected to chat"));
         this.client.on("close", (error: any) => {
             if (error != null) {
-                console.error("Client closed due to error", error);
+                this.toast.current.show("chat connection closed due to error", error);
             }
         });
 
@@ -78,12 +49,15 @@ export default class ChatScreen extends React.Component<IProps, IState> {
 
         this.client.connect();
 
-        setTimeout(() => {
+        this.getChannels().then(channels => {
+            for (const channel of channels) {
+                this.client.join(channel);
+            }
+
             this.setState({
-                addChannel: "gempir"
-                // addChannel: "twitchmedia_qs_10"
-            }, this.addChannel);
-        }, 1000);
+                channels: channels,
+            });
+        });
     }
 
     render() {
@@ -95,6 +69,11 @@ export default class ChatScreen extends React.Component<IProps, IState> {
                     <TextInput placeholder="channel" onChangeText={this.handleAddChannelChange} style={styles.textInput} value={this.state.addChannel} />
                     <Button title="Add channel" onPress={this.addChannel} />
                 </>}
+
+                <Toast ref={this.toast}
+                    // @ts-ignore 
+                    position={"top"}
+                />
             </View>
         );
     }
@@ -104,9 +83,12 @@ export default class ChatScreen extends React.Component<IProps, IState> {
             return;
         }
 
+        const channels = [...this.state.channels, this.state.addChannel];
+
+        this.saveSetting("@channels", channels);
         this.client.join(this.state.addChannel);
         this.setState({
-            channels: [...this.state.channels, this.state.addChannel],
+            channels: channels,
             addChannel: "",
         });
     }
@@ -116,6 +98,23 @@ export default class ChatScreen extends React.Component<IProps, IState> {
             addChannel: text,
         });
     }
+
+    saveSetting = async (key: string, value: object) => {
+        try {
+            await AsyncStorage.setItem(key, JSON.stringify(value))
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    getChannels = async () => {
+        try {
+            const jsonValue = await AsyncStorage.getItem('@channels')
+            return jsonValue != null ? JSON.parse(jsonValue) : [];
+        } catch (e) {
+            console.error(e);
+        }
+    }
 }
 
 const styles = StyleSheet.create({
@@ -123,10 +122,6 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-    },
-    emote: {
-        width: 28,
-        height: 28,
     },
     scrollView: {
         width: "100%",
