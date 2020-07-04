@@ -126,9 +126,6 @@ const styles = StyleSheet.create({
     scrollView: {
         width: "100%",
     },
-    chatMessage: {
-        padding: 3,
-    },
     textInput: {
         borderColor: 'gray',
         borderWidth: 1,

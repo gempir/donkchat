@@ -1,5 +1,6 @@
 import { PrivmsgMessage } from "dank-twitch-irc";
-import { Image } from "react-native";
+import { Image, Text } from "react-native";
+import React from "react";
 
 export default function ChatMessage(props: { message: PrivmsgMessage }) {
     const msg = props.message;
@@ -30,6 +31,8 @@ export default function ChatMessage(props: { message: PrivmsgMessage }) {
     }
 
     return (
-        <Text style={styles.chatMessage}><b style={{ color: props.message.colorRaw }}>{props.message.displayName}</b>: {renderMessage}</Text>
+        <Text style={{
+            padding: 3,
+        }}><b style={{ color: props.message.colorRaw }}>{props.message.displayName}</b>: {renderMessage}</Text>
     );
 }
