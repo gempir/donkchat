@@ -1,4 +1,4 @@
-import { PrivmsgMessage } from "dank-twitch-irc";
+import { PrivmsgMessage } from "dank-twitch-irc/lib/message/twitch-types/privmsg";
 import ChatClient from "./../twitch/ChatClient";
 import * as React from 'react';
 import { FlatList } from 'react-native';

@@ -1,17 +1,16 @@
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native";
-import { PrivmsgMessage } from "dank-twitch-irc";
-import ChatClient from "./../twitch/ChatClient";
+import { PrivmsgMessage } from "dank-twitch-irc/lib/message/twitch-types/privmsg";
 import * as React from "react";
 import Toast from 'react-native-easy-toast';
-import { Provider } from "react-redux";
-import { createStore, applyMiddleware } from "redux";
-import { connect } from "react-redux";
+import { connect, Provider } from "react-redux";
+import { applyMiddleware, createStore } from "redux";
 import thunk from "redux-thunk";
 import ChatScreen from "../screens/ChatScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import { createInitialState, reducer } from "../store/store";
-import { ChatConfig, ChatConfigs } from "./../models/Configs";
+import { ChatConfigs } from "./../models/Configs";
+import ChatClient from "./../twitch/ChatClient";
 
 const Tab = createMaterialTopTabNavigator();
 const store = createStore(reducer, createInitialState(), applyMiddleware(thunk));
