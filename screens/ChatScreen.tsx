@@ -1,9 +1,9 @@
-import { PrivmsgMessage, ChatClient } from "dank-twitch-irc";
+import { ChatClient, PrivmsgMessage } from "dank-twitch-irc";
 import * as React from 'react';
-import { Button, StyleSheet, TextInput, FlatList } from 'react-native';
-import { View } from '../components/Themed';
-import { ChatConfig, ChatConfigs } from '../models/Configs';
+import { FlatList } from 'react-native';
 import { connect } from "react-redux";
+import { View } from '../components/Themed';
+import { ChatConfig } from '../models/Configs';
 import ChatMessage from "./../components/ChatMessage";
 
 interface IProps {
@@ -13,13 +13,11 @@ interface IProps {
 
 interface IState {
     buffer: Array<PrivmsgMessage>;
-    addChannel: string;
 }
 
 class ChatScreen extends React.Component<IProps, IState> {
     state = {
         buffer: [],
-        addChannel: "",
     }
 
     BUFFER_LIMIT: number = 200;
@@ -37,36 +35,13 @@ class ChatScreen extends React.Component<IProps, IState> {
     render() {
         return (
             <View>
-                {/* <ChatTabView cfgs={this.state.chatConfigs} /> */}
-                <View style={styles.container} >
-                    <FlatList inverted data={this.state.buffer.reverse()} renderItem={({ item }) => <ChatMessage message={item} />}
-                        keyExtractor={(item: PrivmsgMessage) => item.messageID} style={styles.scrollView}></FlatList>
-                    <TextInput placeholder="channel" onChangeText={this.handleAddChannelChange} style={styles.textInput} value={this.state.addChannel} />
-                    <Button title="Add channel" onPress={this.addChannel} />
-                </View>
+                <FlatList
+                    inverted
+                    data={this.state.buffer.reverse()}
+                    renderItem={({ item }) => <ChatMessage message={item} />}
+                    keyExtractor={(item: PrivmsgMessage) => item.messageID} />
             </View>
         );
-    }
-
-    addChannel = () => {
-        if (this.state.addChannel === "") {
-            return;
-        }
-
-        const cfg = new ChatConfig(this.state.addChannel);
-
-        // this.saveConfig(cfg);
-        // this.client.join(cfg.channel);
-        this.setState({
-            // chatConfigs: this.state.chatConfigs.createNewWith(cfg),
-            addChannel: "",
-        });
-    }
-
-    handleAddChannelChange = (text: string) => {
-        this.setState({
-            addChannel: text,
-        });
     }
 }
 
@@ -75,21 +50,3 @@ export default connect((state: any) => {
         chatClient: state.chatClient,
     };
 })(ChatScreen);
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    scrollView: {
-        width: "100%",
-    },
-    textInput: {
-        borderColor: 'gray',
-        borderWidth: 1,
-        width: "80%",
-        padding: 10,
-        marginBottom: 20
-    },
-});

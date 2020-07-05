@@ -1,19 +1,19 @@
-import AsyncStorage from '@react-native-community/async-storage';
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import { ChatClient, PrivmsgMessage } from "dank-twitch-irc";
 import * as React from "react";
 import Toast from 'react-native-easy-toast';
 import { Provider } from "react-redux";
-import { createStore } from "redux";
+import { createStore, applyMiddleware } from "redux";
+import { connect } from "react-redux";
+import thunk from "redux-thunk";
 import ChatScreen from "../screens/ChatScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import { createInitialState, reducer } from "../store/store";
 import { ChatConfig, ChatConfigs } from "./../models/Configs";
 
 const Tab = createMaterialTopTabNavigator();
-
-const store = createStore(reducer, createInitialState());
+const store = createStore(reducer, createInitialState(), applyMiddleware(thunk));
 
 interface IProps {
 }
@@ -23,8 +23,18 @@ interface IState {
     chatConfigs: ChatConfigs;
     addChannel: string;
 }
-export default class Navigation extends React.Component<IProps, IState> {
+export default class App extends React.Component<IProps, IState> {
 
+    render() {
+        return (
+            <Provider store={store}>
+                <ConnectedNavigation colorScheme={this.props.colorScheme} />
+            </Provider>
+        );
+    }
+}
+
+class Navigation extends React.Component {
     toast: React.RefObject<any> = React.createRef();
 
     componentDidMount() {
@@ -37,53 +47,33 @@ export default class Navigation extends React.Component<IProps, IState> {
         });
 
         client.connect();
-
-        this.getConfigs().then(cfgs => {
-            for (const cfg of cfgs.toArray()) {
-                client.join(cfg.channel);
-            }
-
-            this.setState({
-                chatConfigs: cfgs,
-            });
-        });
     }
 
     render() {
+        const channelTabs = [];
+
+        for (const cfg of this.props.chatConfigs.toArray()) {
+            channelTabs.push(
+                <Tab.Screen name={cfg.channel} key={cfg.channel}>
+                    {() => <ChatScreen chatConfig={cfg} />}
+                </Tab.Screen>
+            );
+        }
+
         return (
-            <Provider store={store}>
-                <NavigationContainer theme={this.props.colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-                    <Tab.Navigator initialRouteName="Settings">
-                        <Tab.Screen name="Chat" component={() => <ChatScreen chatConfig={new ChatConfig("gempir")} />} />
-                        <Tab.Screen name="Settings" component={SettingsScreen} />
-                    </Tab.Navigator>
-                    <Toast ref={this.toast} />
-                </NavigationContainer>
-            </Provider>
+            <NavigationContainer theme={this.props.colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+                <Tab.Navigator initialRouteName="Settings">
+                    {channelTabs}
+                    <Tab.Screen name="Settings" component={SettingsScreen} />
+                </Tab.Navigator>
+                <Toast ref={this.toast} />
+            </NavigationContainer>
         );
     }
-
-    saveConfig = async (cfg: ChatConfig) => {
-        try {
-            await AsyncStorage.setItem("@chatConfigs", JSON.stringify(this.state.chatConfigs.createNewWith(cfg)))
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-    getConfigs = async () => {
-        try {
-            const jsonValue = await AsyncStorage.getItem('@chatConfigs')
-            const result = jsonValue != null ? JSON.parse(jsonValue) : [];
-            if (result) {
-                return new ChatConfigs(Object.values(result.configs));
-            } else {
-                return new ChatConfigs();
-            }
-        } catch (e) {
-            console.error(e);
-
-            return new ChatConfigs();
-        }
-    }
 }
+
+const ConnectedNavigation = connect((state: any) => {
+    return {
+        chatConfigs: state.chatConfigs,
+    };
+})(Navigation);
