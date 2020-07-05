@@ -1,88 +1,49 @@
-import AsyncStorage from '@react-native-community/async-storage';
-import { ChatClient, PrivmsgMessage } from "dank-twitch-irc";
+import { PrivmsgMessage, ChatClient } from "dank-twitch-irc";
 import * as React from 'react';
-import { Button, Dimensions, StyleSheet, TextInput } from 'react-native';
-import Toast from 'react-native-easy-toast';
-import { SceneMap, TabView } from 'react-native-tab-view';
-import { Text, View } from '../components/Themed';
+import { Button, StyleSheet, TextInput, FlatList } from 'react-native';
+import { View } from '../components/Themed';
 import { ChatConfig, ChatConfigs } from '../models/Configs';
+import { connect } from "react-redux";
+import ChatMessage from "./../components/ChatMessage";
 
 interface IProps {
+    chatClient: ChatClient;
+    chatConfig: ChatConfig;
 }
 
 interface IState {
-    buffers: { [key: string]: Array<PrivmsgMessage> };
-    chatConfigs: ChatConfigs;
+    buffer: Array<PrivmsgMessage>;
     addChannel: string;
 }
 
-export default class ChatScreen extends React.Component<IProps, IState> {
+class ChatScreen extends React.Component<IProps, IState> {
     state = {
-        chatConfigs: new ChatConfigs(),
-        buffers: {},
+        buffer: [],
         addChannel: "",
     }
 
     BUFFER_LIMIT: number = 200;
-    toast: React.RefObject<any> = React.createRef();
-
-    client: ChatClient;
-
-    constructor(props: object) {
-        super(props);
-
-        this.client = new ChatClient({ connection: { type: "websocket", secure: true } });
-    }
 
     componentDidMount() {
-        this.client.on("ready", () => this.toast.current.show("connected to chat"));
-        this.client.on("close", (error: any) => {
-            if (error != null) {
-                this.toast.current.show("chat connection closed due to error", error);
-            }
-        });
-
-        this.client.on("PRIVMSG", (msg) => {
-            const buffer = this.state.buffers[msg.channelName];
-            if (typeof buffer !== "undefined") {
+        this.props.chatClient.on("PRIVMSG", (msg: PrivmsgMessage) => {
+            if (msg.channelName === this.props.chatConfig.channel) {
                 this.setState({
-                    buffers: { ...this.state.buffers, [msg.channelName]: [...buffer.slice(buffer.length - this.BUFFER_LIMIT - 1), msg] },
-                });
-            } else {
-                this.setState({
-                    buffers: { ...this.state.buffers, [msg.channelName]: [msg] },
+                    buffer: [...this.state.buffer.slice(this.state.buffer.length - this.BUFFER_LIMIT - 1), msg],
                 });
             }
-        });
-
-        this.client.connect();
-
-        this.getConfigs().then(cfgs => {
-            for (const cfg of cfgs.toArray()) {
-                console.log(cfg);
-                this.client.join(cfg.channel);
-            }
-
-            this.setState({
-                chatConfigs: cfgs,
-            });
         });
     }
 
     render() {
         return (
             <View>
-                <ChatTabView cfgs={this.state.chatConfigs} />
+                {/* <ChatTabView cfgs={this.state.chatConfigs} /> */}
                 <View style={styles.container} >
-                    {this.state.chatConfigs.length === 0 && <>
-                        <TextInput placeholder="channel" onChangeText={this.handleAddChannelChange} style={styles.textInput} value={this.state.addChannel} />
-                        <Button title="Add channel" onPress={this.addChannel} />
-                    </>}
+                    <FlatList inverted data={this.state.buffer.reverse()} renderItem={({ item }) => <ChatMessage message={item} />}
+                        keyExtractor={(item: PrivmsgMessage) => item.messageID} style={styles.scrollView}></FlatList>
+                    <TextInput placeholder="channel" onChangeText={this.handleAddChannelChange} style={styles.textInput} value={this.state.addChannel} />
+                    <Button title="Add channel" onPress={this.addChannel} />
                 </View>
-                <Toast ref={this.toast}
-                    // @ts-ignore 
-                    position={"top"}
-                />
             </View>
         );
     }
@@ -94,10 +55,10 @@ export default class ChatScreen extends React.Component<IProps, IState> {
 
         const cfg = new ChatConfig(this.state.addChannel);
 
-        this.saveConfig(cfg);
-        this.client.join(cfg.channel);
+        // this.saveConfig(cfg);
+        // this.client.join(cfg.channel);
         this.setState({
-            chatConfigs: this.state.chatConfigs.createNewWith(cfg),
+            // chatConfigs: this.state.chatConfigs.createNewWith(cfg),
             addChannel: "",
         });
     }
@@ -107,31 +68,13 @@ export default class ChatScreen extends React.Component<IProps, IState> {
             addChannel: text,
         });
     }
-
-    saveConfig = async (cfg: ChatConfig) => {
-        try {
-            await AsyncStorage.setItem("@chatConfigs", JSON.stringify(this.state.chatConfigs.createNewWith(cfg)))
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-    getConfigs = async () => {
-        try {
-            const jsonValue = await AsyncStorage.getItem('@chatConfigs')
-            const result = jsonValue != null ? JSON.parse(jsonValue) : [];
-            if (result) {
-                return new ChatConfigs(Object.values(result.configs));
-            } else {
-                return new ChatConfigs();
-            }
-        } catch (e) {
-            console.error(e);
-
-            return new ChatConfigs();
-        }
-    }
 }
+
+export default connect((state: any) => {
+    return {
+        chatClient: state.chatClient,
+    };
+})(ChatScreen);
 
 const styles = StyleSheet.create({
     container: {
@@ -150,37 +93,3 @@ const styles = StyleSheet.create({
         marginBottom: 20
     },
 });
-
-
-const Chat = ({ cfg }) => (
-    <View style={{ width: "100%", height: "100%", backgroundColor: '#ff4081' }} />
-);
-
-function ChatTabView({ cfgs }: { [key: string]: ChatConfigs }) {
-    const [index, setIndex] = React.useState(0);
-
-    const states = [];
-    for (const cfg of cfgs.toArray()) {
-        states.push({ title: cfg.channel, key: cfg.channel });
-    }
-    console.log(states);
-
-    const [routes] = React.useState(states);
-
-    const sceneMap: { [key: string]: React.ComponentType } = {};
-    for (const cfg of cfgs.toArray()) {
-        sceneMap[cfg.channel] = <Chat cfg={cfg} />;
-    }
-
-    {/* {this.state.chatConfigs.length > 0 && <FlatList inverted data={this.state.buffers['gempir'].reverse()} renderItem={({ item }) => <ChatMessage message={item} />} */ }
-    {/* keyExtractor={(item: PrivmsgMessage) => item.messageID} style={styles.scrollView}></FlatList>} */ }
-
-    return (
-        <TabView
-            style={{ height: "100%" }}
-            navigationState={{ index, routes }}
-            renderScene={SceneMap(sceneMap)}
-            onIndexChange={setIndex}
-        />
-    );
-}

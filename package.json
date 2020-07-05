@@ -11,13 +11,16 @@
     "jest": {
         "preset": "jest-expo"
     },
+    "license": "MIT",
     "dependencies": {
         "@expo/vector-icons": "^10.0.0",
         "@react-native-community/async-storage": "^1.11.0",
         "@react-native-community/masked-view": "0.1.10",
         "@react-navigation/bottom-tabs": "^5.6.1",
+        "@react-navigation/material-top-tabs": "^5.2.12",
         "@react-navigation/native": "^5.6.1",
         "@react-navigation/stack": "^5.6.2",
+        "@types/react-redux": "^7.1.9",
         "dank-twitch-irc": "^3.3.0",
         "expo": "~38.0.8",
         "expo-asset": "~8.1.7",
@@ -36,7 +39,9 @@
         "react-native-safe-area-context": "~3.0.7",
         "react-native-screens": "~2.9.0",
         "react-native-tab-view": "^2.14.4",
-        "react-native-web": "~0.11.7"
+        "react-native-web": "~0.11.7",
+        "react-redux": "^7.2.0",
+        "redux": "^4.0.5"
     },
     "devDependencies": {
         "@babel/core": "^7.8.6",
