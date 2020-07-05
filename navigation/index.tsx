@@ -1,6 +1,7 @@
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native";
-import { ChatClient, PrivmsgMessage } from "dank-twitch-irc";
+import { PrivmsgMessage } from "dank-twitch-irc";
+import ChatClient from "./../twitch/ChatClient";
 import * as React from "react";
 import Toast from 'react-native-easy-toast';
 import { Provider } from "react-redux";
@@ -39,12 +40,12 @@ class Navigation extends React.Component {
 
     componentDidMount() {
         const client: ChatClient = store.getState().chatClient;
-        client.on("ready", () => this.toast.current.show("connected to chat"));
-        client.on("close", (error: any) => {
-            if (error != null) {
-                this.toast.current.show("chat connection closed due to error", error);
-            }
-        });
+        // client.on("ready", () => this.toast.current.show("connected to chat"));
+        // client.on("close", (error: any) => {
+        //     if (error != null) {
+        //         this.toast.current.show("chat connection closed due to error", error);
+        //     }
+        // });
 
         client.connect();
     }
