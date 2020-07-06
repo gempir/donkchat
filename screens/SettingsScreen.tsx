@@ -4,14 +4,14 @@ import { ChatConfig, ChatConfigs } from "../models/Configs";
 import { TextInput, Button, StyleSheet } from "react-native";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import ChatClient from "../twitch/ChatClient";
 import setConfigs from "../store/actions/setConfigs";
+import { ChatClient } from "dank-twitch-irc";
 import AsyncStorage from '@react-native-community/async-storage';
 import addChat from "../store/actions/addChat";
 
 interface IProps {
     dispatch: Dispatch
-    chatClient: any
+    chatClient: ChatClient
     chatConfigs: ChatConfigs
 }
 
