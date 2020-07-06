@@ -1,11 +1,10 @@
 import { ChatConfigs } from "../models/Configs";
-import { ChatClient } from "dank-twitch-irc";
+import ChatClient from "./../twitch/ChatClient";
 
 export const createInitialState = () => {
-
     return {
         chatConfigs: new ChatConfigs(),
-        chatClient: new ChatClient({ connection: { type: "websocket", secure: true } }),
+        chatClient: new ChatClient(),
     }
 }
 

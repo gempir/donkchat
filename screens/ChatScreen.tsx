@@ -1,4 +1,5 @@
-import { ChatClient, PrivmsgMessage } from "dank-twitch-irc";
+import { PrivmsgMessage } from "dank-twitch-irc";
+import ChatClient from "./../twitch/ChatClient";
 import * as React from 'react';
 import { FlatList } from 'react-native';
 import { connect } from "react-redux";
@@ -23,7 +24,8 @@ class ChatScreen extends React.Component<IProps, IState> {
     BUFFER_LIMIT: number = 200;
 
     componentDidMount() {
-        this.props.chatClient.on("PRIVMSG", (msg: PrivmsgMessage) => {
+        console.log(this.props.chatClient);
+        this.props.chatClient.addEventHandler(this.props.chatConfig.channel, (msg: PrivmsgMessage) => {
             if (msg.channelName === this.props.chatConfig.channel) {
                 this.setState({
                     buffer: [...this.state.buffer.slice(this.state.buffer.length - this.BUFFER_LIMIT - 1), msg],
