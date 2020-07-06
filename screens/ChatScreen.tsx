@@ -1,4 +1,4 @@
-import { PrivmsgMessage } from "dank-twitch-irc/lib/message/twitch-types/privmsg";
+import { PrivmsgMessage } from "dank-twitch-irc/dist/message/twitch-types/privmsg";
 import ChatClient from "./../twitch/ChatClient";
 import * as React from 'react';
 import { FlatList } from 'react-native';
@@ -24,7 +24,6 @@ class ChatScreen extends React.Component<IProps, IState> {
     BUFFER_LIMIT: number = 200;
 
     componentDidMount() {
-        console.log(this.props.chatClient);
         this.props.chatClient.addEventHandler(this.props.chatConfig.channel, (msg: PrivmsgMessage) => {
             if (msg.channelName === this.props.chatConfig.channel) {
                 this.setState({
@@ -36,9 +35,10 @@ class ChatScreen extends React.Component<IProps, IState> {
 
     render() {
         return (
-            <View>
+            <View style={{ flex: 1 }}>
                 <FlatList
                     inverted
+                    style={{ height: 100 }}
                     data={this.state.buffer.reverse()}
                     renderItem={({ item }) => <ChatMessage message={item} />}
                     keyExtractor={(item: PrivmsgMessage) => item.messageID} />

@@ -1,23 +1,18 @@
-import { PrivmsgMessage } from "dank-twitch-irc/lib/message/twitch-types/privmsg";
-import { parseTwitchMessage } from "dank-twitch-irc/lib/message/parser/twitch-message";
+import { PrivmsgMessage } from "dank-twitch-irc/dist/message/twitch-types/privmsg";
+import { parseTwitchMessage } from "dank-twitch-irc/dist/message/parser/twitch-message";
 
 export type EventHandler = (message: PrivmsgMessage) => void;
 
 export default class ChatClient {
     ws: WebSocket | undefined;
     eventHandlers: Map<string, EventHandler> = new Map();
-
     msgQueue: Array<string> = [];
-
-    connect = () => {
-        this.init();
-    };
 
     addEventHandler = (channel: string, handler: EventHandler) => {
         this.eventHandlers.set(channel, handler);
     };
 
-    init = () => {
+    connect = () => {
         this.ws = new WebSocket("wss://irc-ws.chat.twitch.tv");
 
         this.ws.onopen = this.onOpen;
@@ -29,7 +24,6 @@ export default class ChatClient {
     onOpen = () => {
         this.send("CAP REQ :twitch.tv/commands twitch.tv/tags");
         this.send("NICK justinfan123123");
-        this.join("gempir");
 
         for (const msg of this.msgQueue) {
             this.send(msg);
@@ -56,23 +50,24 @@ export default class ChatClient {
         }
     };
 
-    onError = (error) => {
-        console.error(error);
+    onError = (event: Event) => {
+        console.error(event);
     };
 
-    onClose = (msg) => {
-        console.info('Connection closed', msg);
+    onClose = (event: WebSocketCloseEvent) => {
+        console.error(event);
     };
 
-    send = (message) => {
+    send = (message: string) => {
+        if (typeof this.ws === "undefined") {
+            this.msgQueue.push(message);
+            return;
+        }
+
         try {
             this.ws.send(message);
         } catch (err) {
             this.msgQueue.push(message);
         }
-    };
-
-    sendJson = (data) => {
-        this.send(JSON.stringify(data));
     };
 }

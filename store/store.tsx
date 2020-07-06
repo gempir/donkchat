@@ -8,7 +8,7 @@ export const createInitialState = () => {
     }
 }
 
-export const reducer = (state: object, action: object) => {
+export const reducer = (state: Store, action: any) => {
     switch (action.type) {
         case "SET_CFGS":
             return { ...state, chatConfigs: action.chatConfigs }

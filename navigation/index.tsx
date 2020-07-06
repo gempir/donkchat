@@ -1,8 +1,7 @@
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native";
-import { PrivmsgMessage } from "dank-twitch-irc/lib/message/twitch-types/privmsg";
+import { PrivmsgMessage } from "dank-twitch-irc/dist/message/twitch-types/privmsg";
 import * as React from "react";
-import Toast from 'react-native-easy-toast';
 import { connect, Provider } from "react-redux";
 import { applyMiddleware, createStore } from "redux";
 import thunk from "redux-thunk";
@@ -13,9 +12,11 @@ import { ChatConfigs } from "./../models/Configs";
 import ChatClient from "./../twitch/ChatClient";
 
 const Tab = createMaterialTopTabNavigator();
+// @ts-ignore
 const store = createStore(reducer, createInitialState(), applyMiddleware(thunk));
 
 interface IProps {
+    colorScheme: string
 }
 
 interface IState {
@@ -34,18 +35,10 @@ export default class App extends React.Component<IProps, IState> {
     }
 }
 
-class Navigation extends React.Component {
-    toast: React.RefObject<any> = React.createRef();
-
+class Navigation extends React.Component<{ chatConfigs: ChatConfigs, colorScheme: string }> {
     componentDidMount() {
+        // @ts-ignore
         const client: ChatClient = store.getState().chatClient;
-        // client.on("ready", () => this.toast.current.show("connected to chat"));
-        // client.on("close", (error: any) => {
-        //     if (error != null) {
-        //         this.toast.current.show("chat connection closed due to error", error);
-        //     }
-        // });
-
         client.connect();
     }
 
@@ -66,7 +59,6 @@ class Navigation extends React.Component {
                     {channelTabs}
                     <Tab.Screen name="Settings" component={SettingsScreen} />
                 </Tab.Navigator>
-                <Toast ref={this.toast} />
             </NavigationContainer>
         );
     }

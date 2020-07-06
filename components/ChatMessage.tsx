@@ -1,4 +1,4 @@
-import { PrivmsgMessage } from "dank-twitch-irc/lib/message/twitch-types/privmsg";
+import { PrivmsgMessage } from "dank-twitch-irc/dist/message/twitch-types/privmsg";
 import { Image } from "react-native";
 import { Text } from "./Themed";
 import React from "react";
