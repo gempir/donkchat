@@ -1,12 +1,13 @@
-import AsyncStorage from '@react-native-community/async-storage';
 import React from "react";
-import { Button, StyleSheet, TextInput } from "react-native";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
 import { Text, View } from "../components/Themed";
 import { ChatConfig, ChatConfigs } from "../models/Configs";
-import addChat from "../store/actions/addChat";
+import { TextInput, Button, StyleSheet } from "react-native";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
+import ChatClient from "../twitch/ChatClient";
 import setConfigs from "../store/actions/setConfigs";
+import AsyncStorage from '@react-native-community/async-storage';
+import addChat from "../store/actions/addChat";
 
 interface IProps {
     dispatch: Dispatch

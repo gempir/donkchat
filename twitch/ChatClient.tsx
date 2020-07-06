@@ -1,5 +1,4 @@
-import { PrivmsgMessage } from "dank-twitch-irc/lib/message/twitch-types/privmsg";
-import { parseTwitchMessage } from "dank-twitch-irc/lib/message/parser/twitch-message";
+import { parseTwitchMessage, PrivmsgMessage } from "dank-twitch-irc";
 
 export type EventHandler = (message: PrivmsgMessage) => void;
 
