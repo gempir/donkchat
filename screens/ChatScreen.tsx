@@ -1,11 +1,11 @@
 import { PrivmsgMessage } from "dank-twitch-irc/dist/message/twitch-types/privmsg";
-import ChatClient from "./../twitch/ChatClient";
 import * as React from 'react';
 import { FlatList } from 'react-native';
 import { connect } from "react-redux";
 import { View } from '../components/Themed';
 import { ChatConfig } from '../models/Configs';
 import ChatMessage from "./../components/ChatMessage";
+import ChatClient from "./../twitch/ChatClient";
 
 interface IProps {
     chatClient: ChatClient;
@@ -37,6 +37,8 @@ class ChatScreen extends React.Component<IProps, IState> {
         return (
             <View style={{ flex: 1 }}>
                 <FlatList
+                    updateCellsBatchingPeriod={0}
+                    maxToRenderPerBatch={1}
                     inverted
                     style={{ height: 100 }}
                     data={this.state.buffer.reverse()}

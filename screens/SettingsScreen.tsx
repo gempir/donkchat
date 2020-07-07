@@ -43,9 +43,10 @@ class SettingsScreen extends React.Component<IProps, IState> {
 
     getConfigs = async () => {
         try {
+            // await AsyncStorage.removeItem('@chatConfigs')
             const jsonValue = await AsyncStorage.getItem('@chatConfigs')
             const result = jsonValue != null ? JSON.parse(jsonValue) : [];
-            if (result) {
+            if (result && result.configs) {
                 return new ChatConfigs(Object.values(result.configs));
             } else {
                 return new ChatConfigs();

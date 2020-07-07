@@ -1,39 +1,40 @@
 import { PrivmsgMessage } from "dank-twitch-irc/dist/message/twitch-types/privmsg";
-import { Image } from "react-native";
-import { Text } from "./Themed";
 import React from "react";
+import { Image } from "react-native";
+// import FastImage from "react-native-fast-image";
+import { Text } from "./Themed";
 
-export default function ChatMessage(props: { message: PrivmsgMessage }) {
-    const msg = props.message;
-    const renderMessage = [];
+export default class ChatMessage extends React.Component<{ message: PrivmsgMessage }> {
+    render() {
+        const msg = this.props.message;
+        const renderMessage = [];
 
-    const renderTwitchEmote = (index: number, id: string) => <Image
-        key={index}
-        style={{ width: 28, height: 28 }}
-        source={{
-            uri: `https://static-cdn.jtvnw.net/emoticons/v1/${id}/1.0`,
-        }}
-    />;
+        let replaced;
+        for (var x = 0, c = ''; c = msg.messageText.charAt(x); x++) {
+            replaced = false;
+            for (const emote of msg.emotes) {
+                if (emote.startIndex === x) {
+                    replaced = true;
+                    renderMessage.push(<Image
+                        key={x}
+                        style={{ width: 28, height: 28 }}
+                        source={{
+                            uri: `https://static-cdn.jtvnw.net/emoticons/v1/${emote.id}/1.0`,
+                        }}
+                    />);
+                    x += emote.endIndex - emote.startIndex - 1;
+                }
+            }
 
-    let replaced;
-    for (var x = 0, c = ''; c = msg.messageText.charAt(x); x++) {
-        replaced = false;
-        for (const emote of msg.emotes) {
-            if (emote.startIndex === x) {
-                replaced = true;
-                renderMessage.push(renderTwitchEmote(x, emote.id));
-                x += emote.endIndex - emote.startIndex - 1;
+            if (!replaced) {
+                renderMessage.push(c);
             }
         }
 
-        if (!replaced) {
-            renderMessage.push(c);
-        }
+        return (
+            <Text>
+                <Text style={{ color: this.props.message.colorRaw || null, fontWeight: "bold" }}>{this.props.message.displayName}</Text>: {renderMessage}
+            </Text>
+        );
     }
-
-    return (
-        <Text style={{
-            padding: 3,
-        }}><b style={{ color: props.message.colorRaw }}>{props.message.displayName}</b>: {renderMessage}</Text>
-    );
 }

@@ -2,7 +2,7 @@ export class ChatConfig {
     public readonly channel: string;
 
     constructor(channel: string) {
-        this.channel = channel;
+        this.channel = channel.toLowerCase();
     }
 }
 

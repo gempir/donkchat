@@ -47,7 +47,7 @@ class Navigation extends React.Component<{ chatConfigs: ChatConfigs, colorScheme
 
         for (const cfg of this.props.chatConfigs.toArray()) {
             channelTabs.push(
-                <Tab.Screen name={cfg.channel} key={cfg.channel}>
+                <Tab.Screen name={cfg.channel} key={cfg.channel} >
                     {() => <ChatScreen chatConfig={cfg} />}
                 </Tab.Screen>
             );

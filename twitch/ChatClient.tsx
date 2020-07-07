@@ -22,6 +22,7 @@ export default class ChatClient {
     };
 
     onOpen = () => {
+        console.log("open ws");
         this.send("CAP REQ :twitch.tv/commands twitch.tv/tags");
         this.send("NICK justinfan123123");
 
@@ -65,6 +66,7 @@ export default class ChatClient {
         }
 
         try {
+            console.log(message);
             this.ws.send(message);
         } catch (err) {
             this.msgQueue.push(message);
