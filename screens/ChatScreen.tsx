@@ -27,7 +27,7 @@ class ChatScreen extends React.Component<IProps, IState> {
         this.props.chatClient.addEventHandler(this.props.chatConfig.channel, (msg: PrivmsgMessage) => {
             if (msg.channelName === this.props.chatConfig.channel) {
                 this.setState({
-                    buffer: [...this.state.buffer.slice(this.state.buffer.length - this.BUFFER_LIMIT - 1), msg],
+                    buffer: [msg, ...this.state.buffer.slice(this.state.buffer.length - this.BUFFER_LIMIT - 1)],
                 });
             }
         });
@@ -35,12 +35,12 @@ class ChatScreen extends React.Component<IProps, IState> {
 
     render() {
         return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ flex: 1 }}>
                 <FlatList
                     updateCellsBatchingPeriod={0}
                     maxToRenderPerBatch={1}
                     inverted
-                    data={this.state.buffer.reverse()}
+                    data={this.state.buffer}
                     renderItem={({ item }) => <ChatMessage message={item} />}
                     keyExtractor={(item: PrivmsgMessage) => item.messageID} />
             </View>
