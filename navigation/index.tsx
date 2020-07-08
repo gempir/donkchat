@@ -10,6 +10,7 @@ import SettingsScreen from "../screens/SettingsScreen";
 import { createInitialState, reducer } from "../store/store";
 import { ChatConfigs } from "./../models/Configs";
 import ChatClient from "./../twitch/ChatClient";
+import { View, StatusBar } from "react-native";
 
 const Tab = createMaterialTopTabNavigator();
 // @ts-ignore
@@ -29,6 +30,7 @@ export default class App extends React.Component<IProps, IState> {
     render() {
         return (
             <Provider store={store}>
+                <StatusBar />
                 <ConnectedNavigation colorScheme={this.props.colorScheme} />
             </Provider>
         );

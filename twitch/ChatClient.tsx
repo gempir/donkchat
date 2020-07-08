@@ -66,7 +66,6 @@ export default class ChatClient {
         }
 
         try {
-            console.log(message);
             this.ws.send(message);
         } catch (err) {
             this.msgQueue.push(message);

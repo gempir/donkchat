@@ -11,7 +11,9 @@ export class ChatConfigs {
 
     constructor(configs: Array<ChatConfig> = []) {
         for (const cfg of configs) {
-            this.configs[cfg.channel] = cfg;
+            if (cfg.channel) {
+                this.configs[cfg.channel] = cfg;
+            }
         }
     }
 

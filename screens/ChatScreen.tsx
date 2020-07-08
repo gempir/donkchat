@@ -35,12 +35,11 @@ class ChatScreen extends React.Component<IProps, IState> {
 
     render() {
         return (
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <FlatList
                     updateCellsBatchingPeriod={0}
                     maxToRenderPerBatch={1}
                     inverted
-                    style={{ height: 100 }}
                     data={this.state.buffer.reverse()}
                     renderItem={({ item }) => <ChatMessage message={item} />}
                     keyExtractor={(item: PrivmsgMessage) => item.messageID} />

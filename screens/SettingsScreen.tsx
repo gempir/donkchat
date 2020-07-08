@@ -7,6 +7,8 @@ import { Text, View } from "../components/Themed";
 import { ChatConfig, ChatConfigs } from "../models/Configs";
 import addChat from "../store/actions/addChat";
 import setConfigs from "../store/actions/setConfigs";
+import Colors from '../constants/Colors';
+import { useThemeColor } from "../components/Themed";
 
 interface IProps {
     dispatch: Dispatch
@@ -18,15 +20,21 @@ interface IState {
     addChannel: string,
 }
 
+const Input = (props: any) => {
+    return (
+        <TextInput placeholder="channel" onChangeText={props.handleAddChannelChange} style={{ ...styles.textInput, color: useThemeColor({}, "text") }} value={props.addChannel} />
+    )
+}
+
 class SettingsScreen extends React.Component<IProps, IState> {
     state = {
         addChannel: "",
     }
 
     render() {
-        return <View>
+        return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             {this.props.chatConfigs.toArray().map(cfg => <Text key={cfg.channel}>{cfg.channel}</Text>)}
-            <TextInput placeholder="channel" onChangeText={this.handleAddChannelChange} style={styles.textInput} value={this.state.addChannel} />
+            <Input handleAddChannelChange={this.handleAddChannelChange} addChannel={this.state.addChannel} />
             <Button title="Add channel" onPress={this.addChannel} />
         </View>;
     }
@@ -43,7 +51,7 @@ class SettingsScreen extends React.Component<IProps, IState> {
 
     getConfigs = async () => {
         try {
-            // await AsyncStorage.removeItem('@chatConfigs')
+            await AsyncStorage.removeItem('@chatConfigs')
             const jsonValue = await AsyncStorage.getItem('@chatConfigs')
             const result = jsonValue != null ? JSON.parse(jsonValue) : [];
             if (result && result.configs) {

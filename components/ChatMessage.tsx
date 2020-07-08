@@ -33,7 +33,7 @@ export default class ChatMessage extends React.Component<{ message: PrivmsgMessa
 
         return (
             <Text>
-                <Text style={{ color: this.props.message.colorRaw || null, fontWeight: "bold" }}>{this.props.message.displayName}</Text>: {renderMessage}
+                <Text style={{ color: this.props.message.colorRaw || undefined, fontWeight: "bold" }}>{this.props.message.displayName}</Text>: {renderMessage}
             </Text>
         );
     }
