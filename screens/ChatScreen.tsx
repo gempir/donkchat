@@ -40,6 +40,7 @@ class ChatScreen extends React.Component<IProps, IState> {
                     updateCellsBatchingPeriod={0}
                     maxToRenderPerBatch={1}
                     inverted
+                    style={{ height: 100 }}
                     data={this.state.buffer}
                     renderItem={({ item }) => <ChatMessage message={item} />}
                     keyExtractor={(item: PrivmsgMessage) => item.messageID} />
