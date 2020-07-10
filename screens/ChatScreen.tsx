@@ -24,13 +24,19 @@ class ChatScreen extends React.Component<IProps, IState> {
     BUFFER_LIMIT: number = 200;
 
     componentDidMount() {
-        this.props.chatClient.addEventHandler(this.props.chatConfig.channel, (msg: PrivmsgMessage) => {
-            if (msg.channelName === this.props.chatConfig.channel) {
-                this.setState({
-                    buffer: [msg, ...this.state.buffer.slice(this.state.buffer.length - this.BUFFER_LIMIT - 1)],
-                });
-            }
-        });
+        this.props.chatClient.addEventHandler(this.props.chatConfig.channel, this.handleMessage);
+    }
+
+    componentWillUnmount() {
+        this.props.chatClient.removeEventHandler(this.props.chatConfig.channel);
+    }
+
+    handleMessage = (msg: PrivmsgMessage) => {
+        if (msg.channelName === this.props.chatConfig.channel) {
+            this.setState({
+                buffer: [msg, ...this.state.buffer.slice(this.state.buffer.length - this.BUFFER_LIMIT - 1)],
+            });
+        }
     }
 
     render() {

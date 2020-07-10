@@ -33,7 +33,7 @@ class SettingsScreen extends React.Component<IProps, IState> {
 
     render() {
         return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            {this.props.chatConfigs.toArray().map(cfg => <Text key={cfg.channel}>{cfg.channel}</Text>)}
+            {this.props.chatConfigs.toArray().map(cfg => <Text key={cfg.channel} style={{ fontSize: 24, paddingBottom: 20 }} onPress={() => this.removeChannel(cfg)}>{cfg.channel}</Text>)}
             <Input handleAddChannelChange={this.handleAddChannelChange} addChannel={this.state.addChannel} />
             <Button title="Add channel" onPress={this.addChannel} />
         </View>;
@@ -47,6 +47,26 @@ class SettingsScreen extends React.Component<IProps, IState> {
 
             this.props.dispatch(setConfigs(cfgs));
         });
+    }
+
+    removeChannel = async (cfg: ChatConfig) => {
+        try {
+            const jsonValue = await AsyncStorage.getItem('@chatConfigs')
+            const result = jsonValue != null ? JSON.parse(jsonValue) : [];
+            if (result && result.configs) {
+                const toSave = [];
+                for (const config of Object.values(result.configs)) {
+                    if (config.channel !== cfg.channel) {
+                        toSave.push(config);
+                    }
+                }
+
+                this.props.dispatch(setConfigs(new ChatConfigs(toSave)));
+                await AsyncStorage.setItem("@chatConfigs", JSON.stringify(toSave));
+            }
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     getConfigs = async () => {

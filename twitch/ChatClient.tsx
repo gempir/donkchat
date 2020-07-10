@@ -12,6 +12,10 @@ export default class ChatClient {
         this.eventHandlers.set(channel, handler);
     };
 
+    removeEventHandler = (channel: string) => {
+        this.eventHandlers.delete(channel);
+    }
+
     connect = () => {
         this.ws = new WebSocket("wss://irc-ws.chat.twitch.tv");
 

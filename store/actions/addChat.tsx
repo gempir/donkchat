@@ -3,7 +3,7 @@ import { Dispatch } from "react";
 import { ChatConfig, ChatConfigs } from "../../models/Configs";
 import { Store } from "./../store";
 
-export default (cfg: ChatConfig) => (dispatch: Dispatch<object>, getState: (value: void) => Store) => {
+export default (cfg: ChatConfig): any => (dispatch: Dispatch<object>, getState: (value: void) => Store) => {
     const cfgs = getState().chatConfigs.createNewWith(cfg);
 
     getState().chatClient.join(cfg.channel);
