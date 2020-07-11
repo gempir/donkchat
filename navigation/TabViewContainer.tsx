@@ -11,13 +11,17 @@ const initialLayout = { width: Dimensions.get('window').width };
 type route = { title: string, key: string, cfg?: ChatConfig };
 type routes = Array<route>;
 
-const renderTabBar = (props: any) => {
+const ThemedTabBar = (props: any) => {
     return <TabBar
         {...props}
         labelStyle={{ color: useThemeColor("text") }}
         indicatorStyle={{ backgroundColor: useThemeColor("tint") }}
         style={{ backgroundColor: useThemeColor("background") }}
     />;
+}
+
+const renderTabBar = (props: any) => {
+    return <ThemedTabBar {...props} />
 };
 
 
