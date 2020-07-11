@@ -1,5 +1,6 @@
 import { PrivmsgMessage } from "dank-twitch-irc/dist/message/twitch-types/privmsg";
 import { parseTwitchMessage } from "dank-twitch-irc/dist/message/parser/twitch-message";
+import { PingMessage } from "dank-twitch-irc/dist/message/twitch-types/connection/ping";
 
 export type EventHandler = (message: PrivmsgMessage) => void;
 
@@ -7,6 +8,7 @@ export default class ChatClient {
     ws: WebSocket | undefined;
     eventHandlers: Map<string, EventHandler> = new Map();
     msgQueue: Array<string> = [];
+    joinedChannels: Array<string> = [];
 
     addEventHandler = (channel: string, handler: EventHandler) => {
         this.eventHandlers.set(channel, handler);
@@ -33,10 +35,17 @@ export default class ChatClient {
         for (const msg of this.msgQueue) {
             this.send(msg);
         }
+        for (const channel of this.joinedChannels) {
+            this.join(channel);
+        }
     };
 
     join = (channel: string) => {
-        this.send(`JOIN #${channel}`);
+        const sent = this.send(`JOIN #${channel}`);
+
+        if (sent) {
+            this.joinedChannels.push(channel);
+        }
     };
 
     onMessage = (message: MessageEvent) => {
@@ -50,29 +59,36 @@ export default class ChatClient {
                     }
                 });
             }
+            if (msg instanceof PingMessage) {
+                this.send("PONG :tmi.twitch.tv");
+            }
         } catch (err) {
             console.error(err);
         }
     };
 
     onError = (event: Event) => {
-        console.error(event);
+        console.log(event);
+        this.connect();
     };
 
     onClose = (event: WebSocketCloseEvent) => {
-        console.error(event);
+        console.log(event);
+        this.connect();
     };
 
     send = (message: string) => {
         if (typeof this.ws === "undefined") {
             this.msgQueue.push(message);
-            return;
+            return false;
         }
 
         try {
             this.ws.send(message);
+            return true;
         } catch (err) {
             this.msgQueue.push(message);
+            return false;
         }
     };
 }
