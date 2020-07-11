@@ -1,4 +1,5 @@
 import { ChatConfigs } from "../models/Configs";
+import { AnyAction } from "redux";
 import ChatClient from "./../twitch/ChatClient";
 
 export const createInitialState = () => {
@@ -8,7 +9,7 @@ export const createInitialState = () => {
     }
 }
 
-export const reducer = (state: Store, action: any) => {
+export const reducer = (state: any, action: AnyAction) => {
     switch (action.type) {
         case "SET_CFGS":
             return { ...state, chatConfigs: action.chatConfigs }

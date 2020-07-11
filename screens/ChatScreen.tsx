@@ -34,7 +34,7 @@ class ChatScreen extends React.Component<IProps, IState> {
     handleMessage = (msg: PrivmsgMessage) => {
         if (msg.channelName === this.props.chatConfig.channel) {
             this.setState({
-                buffer: [msg, ...this.state.buffer.slice(this.state.buffer.length - this.BUFFER_LIMIT - 1)],
+                buffer: [...this.state.buffer.slice(this.state.buffer.length - this.BUFFER_LIMIT - 1), msg],
             });
         }
     }
@@ -47,7 +47,7 @@ class ChatScreen extends React.Component<IProps, IState> {
                     maxToRenderPerBatch={1}
                     inverted
                     style={{ height: 100 }}
-                    data={this.state.buffer}
+                    data={this.state.buffer.reverse()}
                     renderItem={({ item }) => <ChatMessage message={item} />}
                     keyExtractor={(item: PrivmsgMessage) => item.messageID} />
             </View>

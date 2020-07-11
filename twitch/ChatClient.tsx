@@ -63,7 +63,7 @@ export default class ChatClient {
                 this.send("PONG :tmi.twitch.tv");
             }
         } catch (err) {
-            console.error(err);
+            console.log(err);
         }
     };
 

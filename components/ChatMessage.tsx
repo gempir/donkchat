@@ -1,7 +1,6 @@
 import { PrivmsgMessage } from "dank-twitch-irc/dist/message/twitch-types/privmsg";
 import React from "react";
 import { Image } from "react-native";
-// import FastImage from "react-native-fast-image";
 import { Text } from "./Themed";
 
 export default class ChatMessage extends React.Component<{ message: PrivmsgMessage }> {

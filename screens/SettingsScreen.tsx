@@ -34,7 +34,7 @@ class SettingsScreen extends React.Component<IProps, IState> {
     render() {
         return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             {this.props.chatConfigs.toArray().map(cfg => <Text key={cfg.channel} style={{ fontSize: 24, paddingBottom: 20 }} onPress={() => this.removeChannel(cfg)}>{cfg.channel}</Text>)}
-            <Input handleAddChannelChange={this.handleAddChannelChange} addChannel={this.state.addChannel} />
+            <Input autoCorrect={false} handleAddChannelChange={this.handleAddChannelChange} addChannel={this.state.addChannel} />
             <Button title="Add channel" onPress={this.addChannel} />
         </View>;
     }
