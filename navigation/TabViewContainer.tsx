@@ -1,8 +1,7 @@
 import * as React from "react";
 import { Dimensions } from "react-native";
 import { TabBar, TabView } from 'react-native-tab-view';
-import { applyColor } from "../constants/Colors";
-import useColorScheme from "../hooks/useColorScheme";
+import { useThemeColor } from "../components/Themed";
 import ChatScreen from "../screens/ChatScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import { ChatConfig } from "./../models/Configs";
@@ -12,19 +11,13 @@ const initialLayout = { width: Dimensions.get('window').width };
 type route = { title: string, key: string, cfg?: ChatConfig };
 type routes = Array<route>;
 
-const ThemedBarBar = (props: any) => {
-    const scheme = useColorScheme();
-
+const renderTabBar = (props: any) => {
     return <TabBar
         {...props}
-        labelStyle={{ color: applyColor(scheme, "text") }}
-        indicatorStyle={{ backgroundColor: applyColor(scheme, "tint") }}
-        style={{ backgroundColor: applyColor(scheme, "background") }}
+        labelStyle={{ color: useThemeColor("text") }}
+        indicatorStyle={{ backgroundColor: useThemeColor("tint") }}
+        style={{ backgroundColor: useThemeColor("background") }}
     />;
-}
-
-const renderTabBar = (props: any) => {
-    return <ThemedBarBar {...props} />
 };
 
 

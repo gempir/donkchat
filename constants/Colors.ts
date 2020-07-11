@@ -21,8 +21,3 @@ const colors = {
 };
 
 export default colors;
-
-export function applyColor(scheme: ColorScheme, colorType: string) {
-    // @ts-ignore
-    return colors[scheme][colorType];
-}

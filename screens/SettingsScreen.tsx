@@ -22,7 +22,14 @@ interface IState {
 
 const Input = (props: any) => {
     return (
-        <TextInput placeholder="channel" onChangeText={props.handleAddChannelChange} style={{ ...styles.textInput, color: useThemeColor({}, "text") }} value={props.addChannel} />
+        <TextInput placeholder="channel" onChangeText={props.handleAddChannelChange} style={{
+            borderColor: 'gray',
+            borderWidth: 1,
+            width: "80%",
+            padding: 10,
+            marginBottom: 20,
+            color: useThemeColor("text")
+        }} value={props.addChannel} />
     )
 }
 
@@ -32,10 +39,14 @@ class SettingsScreen extends React.Component<IProps, IState> {
     }
 
     render() {
-        return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            {this.props.chatConfigs.toArray().map(cfg => <Text key={cfg.channel} style={{ fontSize: 24, paddingBottom: 20 }} onPress={() => this.removeChannel(cfg)}>{cfg.channel}</Text>)}
-            <Input autoCorrect={false} handleAddChannelChange={this.handleAddChannelChange} addChannel={this.state.addChannel} />
-            <Button title="Add channel" onPress={this.addChannel} />
+        return <View style={{ flex: 1 }}>
+            <View style={{ flexDirection: 'row', padding: 20 }}>
+                <Input autoCorrect={false} handleAddChannelChange={this.handleAddChannelChange} addChannel={this.state.addChannel} />
+                <Button title="Add channel" onPress={this.addChannel} />
+            </View>
+            <View style={{ padding: 20 }}>
+                {this.props.chatConfigs.toArray().map(cfg => <Text key={cfg.channel} style={{ fontSize: 24, paddingBottom: 20 }} onPress={() => this.removeChannel(cfg)}>{cfg.channel}</Text>)}
+            </View>
         </View>;
     }
 
@@ -114,21 +125,3 @@ export default connect((state: any) => {
         chatConfigs: state.chatConfigs,
     };
 })(SettingsScreen);
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    scrollView: {
-        width: "100%",
-    },
-    textInput: {
-        borderColor: 'gray',
-        borderWidth: 1,
-        width: "80%",
-        padding: 10,
-        marginBottom: 20
-    },
-});
