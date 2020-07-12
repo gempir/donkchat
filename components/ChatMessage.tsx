@@ -35,9 +35,9 @@ class ChatMessage extends React.Component<{ message: PrivmsgMessage, bttvChannel
         if (this.props.bttvChannelEmotes.has(msg.channelID)) {
             const emotes = this.props.bttvChannelEmotes.get(msg.channelID) || [];
             for (const emote of emotes) {
-                // const regex = new RegExp(`\\b(${emote.code})\\b`, "g");
-                const index = msg.messageText.indexOf(emote.code);
-                if (index !== -1) {
+                let pos = 0;
+                let index = msg.messageText.indexOf(emote.code, pos);
+                while (index > -1) {
                     renderMessage[index] = <Image key={index} style={{ width: 28, height: 28 }}
                         source={{
                             uri: `https://cdn.betterttv.net/emote/${emote.id}/1x`,
@@ -46,6 +46,8 @@ class ChatMessage extends React.Component<{ message: PrivmsgMessage, bttvChannel
                     for (let i = index + 1; i < index + emote.code.length; i++) {
                         delete renderMessage[i];
                     }
+                    pos = index + emote.code.length;
+                    index = msg.messageText.indexOf(emote.code, pos);
                 }
             }
         }
