@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import React from "react";
-import { Button, StyleSheet, TextInput } from "react-native";
+import { Button, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { Text, View } from "../components/Themed";
@@ -9,6 +9,7 @@ import addChat from "../store/actions/addChat";
 import setConfigs from "../store/actions/setConfigs";
 import Colors from '../constants/Colors';
 import { useThemeColor } from "../components/Themed";
+import ThemedButton from '../components/ThemedButton';
 
 interface IProps {
     dispatch: Dispatch
@@ -22,12 +23,12 @@ interface IState {
 
 const Input = (props: any) => {
     return (
-        <TextInput placeholder="channel" onChangeText={props.handleAddChannelChange} style={{
+        <TextInput placeholder="channel" autoCorrect={false} onChangeText={props.handleAddChannelChange} style={{
             borderColor: 'gray',
-            borderWidth: 1,
             width: "80%",
+            borderWidth: 1,
             padding: 10,
-            marginBottom: 20,
+            marginRight: 10,
             color: useThemeColor("text")
         }} value={props.addChannel} />
     )
@@ -41,15 +42,14 @@ class SettingsScreen extends React.Component<IProps, IState> {
     render() {
         return <View style={{ flex: 1 }}>
             <View style={{ flexDirection: 'row', padding: 20, alignItems: 'stretch' }}>
-                <View style={{ height: 55, width: "80%" }}>
-                    <Input autoCorrect={false} handleAddChannelChange={this.handleAddChannelChange} addChannel={this.state.addChannel} />
-                </View>
-                <View style={{ width: "20%" }}>
-                    <Button title="Add" onPress={this.addChannel} />
-                </View>
+                <Input addChannel={this.state.addChannel} handleAddChannelChange={this.handleAddChannelChange} />
+                <ThemedButton style={{ width: "20%" }} onPress={this.addChannel}>Add</ThemedButton>
             </View>
-            <View style={{ padding: 20 }}>
-                {this.props.chatConfigs.toArray().map(cfg => <Text key={cfg.channel} style={{ fontSize: 24, paddingBottom: 20 }} onPress={() => this.removeChannel(cfg)}>{cfg.channel}</Text>)}
+            <View style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 20 }}>
+                <Text>Click channel to remove</Text>
+            </View>
+            <View style={{ flexDirection: 'row', padding: 10, paddingTop: 10, alignItems: 'stretch' }}>
+                {this.props.chatConfigs.toArray().map(cfg => <ThemedButton style={{ height: 40, marginRight: 10, marginLeft: 10 }} key={cfg.channel} onPress={() => this.removeChannel(cfg)}>{cfg.channel}</ThemedButton>)}
             </View>
         </View>;
     }
