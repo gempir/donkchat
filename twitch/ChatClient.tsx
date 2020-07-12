@@ -10,12 +10,16 @@ export default class ChatClient {
     msgQueue: Array<string> = [];
     joinedChannels: Array<string> = [];
 
-    addEventHandler = (channel: string, handler: EventHandler) => {
-        this.eventHandlers.set(channel, handler);
+    addEventHandler = (handler: EventHandler) => {
+        const handlerId = Math.random().toString(36).substring(7);
+
+        this.eventHandlers.set(handlerId, handler);
+
+        return handlerId;
     };
 
-    removeEventHandler = (channel: string) => {
-        this.eventHandlers.delete(channel);
+    removeEventHandler = (handlerId: string) => {
+        this.eventHandlers.delete(handlerId);
     }
 
     connect = () => {
@@ -53,10 +57,8 @@ export default class ChatClient {
             const msg = parseTwitchMessage(message.data);
 
             if (msg instanceof PrivmsgMessage) {
-                this.eventHandlers.forEach((value: EventHandler, key: string) => {
-                    if (key === msg.channelName) {
-                        value(msg);
-                    }
+                this.eventHandlers.forEach((value: EventHandler) => {
+                    value(msg);
                 });
             }
             if (msg instanceof PingMessage) {

@@ -1,15 +1,20 @@
 import { PrivmsgMessage } from "dank-twitch-irc/dist/message/twitch-types/privmsg";
 import * as React from 'react';
 import { FlatList } from 'react-native';
+import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { View } from '../components/Themed';
 import { ChatConfig } from '../models/Configs';
 import ChatMessage from "./../components/ChatMessage";
 import ChatClient from "./../twitch/ChatClient";
+import { BttvChannelEmotes } from "../store/store";
+import loadBttvChannelEmotes from "../store/actions/loadBttvChannelEmotes";
 
 interface IProps {
     chatClient: ChatClient;
     chatConfig: ChatConfig;
+    bttvChannelEmotes: BttvChannelEmotes;
+    dispatch: Dispatch<any>;
 }
 
 interface IState {
@@ -21,18 +26,23 @@ class ChatScreen extends React.Component<IProps, IState> {
         buffer: [],
     }
 
+    handlerId: string = "";
     BUFFER_LIMIT: number = 200;
 
     componentDidMount() {
-        this.props.chatClient.addEventHandler(this.props.chatConfig.channel, this.handleMessage);
+        this.handlerId = this.props.chatClient.addEventHandler(this.handleMessage);
     }
 
     componentWillUnmount() {
-        this.props.chatClient.removeEventHandler(this.props.chatConfig.channel);
+        this.props.chatClient.removeEventHandler(this.handlerId);
     }
 
     handleMessage = (msg: PrivmsgMessage) => {
         if (msg.channelName === this.props.chatConfig.channel) {
+            if (!this.props.bttvChannelEmotes.has(msg.channelID)) {
+                this.props.dispatch(loadBttvChannelEmotes(msg.channelID))
+            }
+
             const newBuffer: Array<PrivmsgMessage> = this.state.buffer.slice(this.state.buffer.length - this.BUFFER_LIMIT - 1);
             newBuffer.unshift(msg);
             this.setState({
@@ -43,7 +53,7 @@ class ChatScreen extends React.Component<IProps, IState> {
 
     render() {
         return (
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, paddingLeft: 5, paddingRight: 5 }}>
                 <FlatList
                     updateCellsBatchingPeriod={0}
                     maxToRenderPerBatch={1}
@@ -60,5 +70,6 @@ class ChatScreen extends React.Component<IProps, IState> {
 export default connect((state: any) => {
     return {
         chatClient: state.chatClient,
+        bttvChannelEmotes: state.bttvChannelEmotes,
     };
 })(ChatScreen);

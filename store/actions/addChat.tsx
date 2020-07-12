@@ -5,8 +5,8 @@ import { Store } from "./../store";
 
 export default (cfg: ChatConfig): any => (dispatch: Dispatch<object>, getState: (value: void) => Store) => {
     const cfgs = getState().chatConfigs.createNewWith(cfg);
-
-    getState().chatClient.join(cfg.channel);
+    const chatClient = getState().chatClient;
+    chatClient.join(cfg.channel);
 
     dispatch({
         type: 'SET_CFGS',

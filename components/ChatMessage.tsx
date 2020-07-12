@@ -2,8 +2,10 @@ import { PrivmsgMessage } from "dank-twitch-irc/dist/message/twitch-types/privms
 import React from "react";
 import { Image } from "react-native";
 import { Text } from "./Themed";
+import { connect } from "react-redux";
+import { Store, BttvChannelEmotes } from "./../store/store";
 
-export default class ChatMessage extends React.Component<{ message: PrivmsgMessage }> {
+class ChatMessage extends React.Component<{ message: PrivmsgMessage, bttvChannelEmotes: BttvChannelEmotes }> {
     render() {
         const msg = this.props.message;
         const renderMessage = [];
@@ -30,6 +32,24 @@ export default class ChatMessage extends React.Component<{ message: PrivmsgMessa
             }
         }
 
+        if (this.props.bttvChannelEmotes.has(msg.channelID)) {
+            const emotes = this.props.bttvChannelEmotes.get(msg.channelID) || [];
+            for (const emote of emotes) {
+                // const regex = new RegExp(`\\b(${emote.code})\\b`, "g");
+                const index = msg.messageText.indexOf(emote.code);
+                if (index !== -1) {
+                    renderMessage[index] = <Image key={index} style={{ width: 28, height: 28 }}
+                        source={{
+                            uri: `https://cdn.betterttv.net/emote/${emote.id}/1x`,
+                        }} />
+
+                    for (let i = index + 1; i < index + emote.code.length; i++) {
+                        delete renderMessage[i];
+                    }
+                }
+            }
+        }
+
         return (
             <Text>
                 <Text style={{ color: this.props.message.colorRaw || undefined, fontWeight: "bold" }}>{this.props.message.displayName}</Text>: {renderMessage}
@@ -37,3 +57,7 @@ export default class ChatMessage extends React.Component<{ message: PrivmsgMessa
         );
     }
 }
+
+export default connect((state: Store) => ({
+    bttvChannelEmotes: state.bttvChannelEmotes,
+}))(ChatMessage);
