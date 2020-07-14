@@ -11,7 +11,9 @@ class ChatMessage extends React.Component<{ message: PrivmsgMessage, bttvChannel
         const renderMessage = [];
 
         let replaced;
-        for (var x = 0, c = ''; c = msg.messageText.charAt(x); x++) {
+        let buffer = "";
+
+        for (var x = 0, c = ""; c = msg.messageText.charAt(x); x++) {
             replaced = false;
             for (const emote of msg.emotes) {
                 if (emote.startIndex === x) {
@@ -28,29 +30,36 @@ class ChatMessage extends React.Component<{ message: PrivmsgMessage, bttvChannel
             }
 
             if (!replaced) {
+                if (c !== " " && x !== msg.messageText.length - 1) {
+                    buffer += c;
+                    continue;
+                }
+
+                let emoteFound = false;
+
+                if (this.props.bttvChannelEmotes.has(msg.channelID)) {
+                    const emotes = this.props.bttvChannelEmotes.get(msg.channelID) || [];
+                    for (const emote of emotes) {
+                        if (buffer.trim() === emote.code) {
+                            emoteFound = true;
+                            renderMessage.push(<Image key={x} style={{ width: 28, height: 28 }}
+                                source={{
+                                    uri: `https://cdn.betterttv.net/emote/${emote.id}/1x`,
+                                }} />
+                            );
+                        }
+                    }
+                }
+
+                if (!emoteFound) {
+                    renderMessage.push(buffer);
+                    buffer = "";
+                }
                 renderMessage.push(c);
             }
         }
 
-        if (this.props.bttvChannelEmotes.has(msg.channelID)) {
-            const emotes = this.props.bttvChannelEmotes.get(msg.channelID) || [];
-            for (const emote of emotes) {
-                let pos = 0;
-                let index = msg.messageText.indexOf(emote.code, pos);
-                while (index > -1) {
-                    renderMessage[index] = <Image key={index} style={{ width: 28, height: 28 }}
-                        source={{
-                            uri: `https://cdn.betterttv.net/emote/${emote.id}/1x`,
-                        }} />
 
-                    for (let i = index + 1; i < index + emote.code.length; i++) {
-                        delete renderMessage[i];
-                    }
-                    pos = index + emote.code.length;
-                    index = msg.messageText.indexOf(emote.code, pos);
-                }
-            }
-        }
 
         return (
             <Text>

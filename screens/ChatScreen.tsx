@@ -27,7 +27,7 @@ class ChatScreen extends React.Component<IProps, IState> {
     }
 
     handlerId: string = "";
-    BUFFER_LIMIT: number = 200;
+    BUFFER_LIMIT: number = 100;
 
     componentDidMount() {
         this.handlerId = this.props.chatClient.addEventHandler(this.handleMessage);
@@ -43,7 +43,10 @@ class ChatScreen extends React.Component<IProps, IState> {
                 this.props.dispatch(loadBttvChannelEmotes(msg.channelID))
             }
 
-            const newBuffer: Array<PrivmsgMessage> = this.state.buffer.slice(this.state.buffer.length - this.BUFFER_LIMIT - 1);
+            const newBuffer: Array<PrivmsgMessage> = this.state.buffer.slice();
+            if (newBuffer.length >= this.BUFFER_LIMIT) {
+                newBuffer.pop();
+            }
             newBuffer.unshift(msg);
             this.setState({
                 buffer: newBuffer,
