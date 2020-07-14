@@ -7,13 +7,13 @@ import { View } from '../components/Themed';
 import { ChatConfig } from '../models/Configs';
 import ChatMessage from "./../components/ChatMessage";
 import ChatClient from "./../twitch/ChatClient";
-import { BttvChannelEmotes } from "../store/store";
-import loadBttvChannelEmotes from "../store/actions/loadBttvChannelEmotes";
+import { ThirdPartyEmotes } from "../store/store";
+import loadThirdPartyEmotes from "../store/actions/loadThirdPartyEmotes";
 
 interface IProps {
     chatClient: ChatClient;
     chatConfig: ChatConfig;
-    bttvChannelEmotes: BttvChannelEmotes;
+    thirdPartyEmotes: ThirdPartyEmotes;
     dispatch: Dispatch<any>;
 }
 
@@ -39,8 +39,8 @@ class ChatScreen extends React.Component<IProps, IState> {
 
     handleMessage = (msg: PrivmsgMessage) => {
         if (msg.channelName === this.props.chatConfig.channel) {
-            if (!this.props.bttvChannelEmotes.has(msg.channelID)) {
-                this.props.dispatch(loadBttvChannelEmotes(msg.channelID))
+            if (!this.props.thirdPartyEmotes.has(msg.channelID)) {
+                this.props.dispatch(loadThirdPartyEmotes(msg.channelID))
             }
 
             const newBuffer: Array<PrivmsgMessage> = this.state.buffer.slice();
@@ -73,6 +73,6 @@ class ChatScreen extends React.Component<IProps, IState> {
 export default connect((state: any) => {
     return {
         chatClient: state.chatClient,
-        bttvChannelEmotes: state.bttvChannelEmotes,
+        thirdPartyEmotes: state.thirdPartyEmotes,
     };
 })(ChatScreen);

@@ -1,15 +1,13 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import React from "react";
-import { Button, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import { TextInput } from "react-native";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import { Text, View } from "../components/Themed";
+import { Text, useThemeColor, View } from "../components/Themed";
+import ThemedButton from '../components/ThemedButton';
 import { ChatConfig, ChatConfigs } from "../models/Configs";
 import addChat from "../store/actions/addChat";
 import setConfigs from "../store/actions/setConfigs";
-import Colors from '../constants/Colors';
-import { useThemeColor } from "../components/Themed";
-import ThemedButton from '../components/ThemedButton';
 
 interface IProps {
     dispatch: Dispatch
@@ -71,11 +69,12 @@ class SettingsScreen extends React.Component<IProps, IState> {
             if (result && result.configs) {
                 const toSave = [];
                 for (const config of Object.values(result.configs)) {
+                    // @ts-ignore
                     if (config.channel !== cfg.channel) {
                         toSave.push(config);
                     }
                 }
-
+                // @ts-ignore
                 this.props.dispatch(setConfigs(new ChatConfigs(toSave)));
                 await AsyncStorage.setItem("@chatConfigs", JSON.stringify(toSave));
             }

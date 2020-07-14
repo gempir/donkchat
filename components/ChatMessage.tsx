@@ -3,9 +3,9 @@ import React from "react";
 import { Image } from "react-native";
 import { Text } from "./Themed";
 import { connect } from "react-redux";
-import { Store, BttvChannelEmotes } from "./../store/store";
+import { Store, ThirdPartyEmotes } from "./../store/store";
 
-class ChatMessage extends React.Component<{ message: PrivmsgMessage, bttvChannelEmotes: BttvChannelEmotes }> {
+class ChatMessage extends React.Component<{ message: PrivmsgMessage, thirdPartyEmotes: ThirdPartyEmotes }> {
     render() {
         const msg = this.props.message;
         const renderMessage = [];
@@ -37,16 +37,18 @@ class ChatMessage extends React.Component<{ message: PrivmsgMessage, bttvChannel
 
                 let emoteFound = false;
 
-                if (this.props.bttvChannelEmotes.has(msg.channelID)) {
-                    const emotes = this.props.bttvChannelEmotes.get(msg.channelID) || [];
+                if (this.props.thirdPartyEmotes.has(msg.channelID)) {
+                    const emotes = this.props.thirdPartyEmotes.get(msg.channelID) || [];
                     for (const emote of emotes) {
                         if (buffer.trim() === emote.code) {
                             emoteFound = true;
                             renderMessage.push(<Image key={x} style={{ width: 28, height: 28 }}
                                 source={{
-                                    uri: `https://cdn.betterttv.net/emote/${emote.id}/1x`,
+                                    uri: emote.url,
                                 }} />
                             );
+
+                            break;
                         }
                     }
                 }
@@ -70,5 +72,5 @@ class ChatMessage extends React.Component<{ message: PrivmsgMessage, bttvChannel
 }
 
 export default connect((state: Store) => ({
-    bttvChannelEmotes: state.bttvChannelEmotes,
+    thirdPartyEmotes: state.thirdPartyEmotes,
 }))(ChatMessage);
