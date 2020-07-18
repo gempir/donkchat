@@ -3,7 +3,7 @@ import React from "react";
 import { Text } from "./Themed";
 import { connect } from "react-redux";
 import { Store, ThirdPartyEmotes } from "./../store/store";
-import FastImage from "react-native-fast-image/dist/index.js";
+import FastImage from "react-native-fast-image";
 
 class ChatMessage extends React.Component<{ message: PrivmsgMessage, thirdPartyEmotes: ThirdPartyEmotes }> {
     render() {
