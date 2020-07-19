@@ -3,7 +3,7 @@ import React from "react";
 import { Text } from "./Themed";
 import { connect } from "react-redux";
 import { Store, ThirdPartyEmotes } from "./../store/store";
-import FastImage from "react-native-fast-image";
+import {Image} from "react-native";
 
 class ChatMessage extends React.Component<{ message: PrivmsgMessage, thirdPartyEmotes: ThirdPartyEmotes }> {
     render() {
@@ -18,18 +18,13 @@ class ChatMessage extends React.Component<{ message: PrivmsgMessage, thirdPartyE
             for (const emote of msg.emotes) {
                 if (emote.startIndex === x) {
                     replaced = true;
-                    renderMessage.push(
-                        <FastImage key={x} source={{
+                    renderMessage.push(<Image
+                        key={x}
+                        style={{ width: 28, height: 28 }}
+                        source={{
                             uri: `https://static-cdn.jtvnw.net/emoticons/v1/${emote.id}/1.0`,
-                        }} />
-                    );
-                    // renderMessage.push(<Image
-                    //     key={x}
-                    //     style={{ width: 28, height: 28 }}
-                    //     source={{
-                    //         uri: `https://static-cdn.jtvnw.net/emoticons/v1/${emote.id}/1.0`,
-                    //     }}
-                    // />);
+                        }}
+                    />);
                     x += emote.endIndex - emote.startIndex - 1;
                 }
             }
@@ -47,7 +42,7 @@ class ChatMessage extends React.Component<{ message: PrivmsgMessage, thirdPartyE
                     for (const emote of emotes) {
                         if (buffer.trim() === emote.code) {
                             emoteFound = true;
-                            renderMessage.push(<FastImage key={x} style={{ width: 28, height: 28 }}
+                            renderMessage.push(<Image key={x} style={{ width: 28, height: 28 }}
                                 source={{
                                     uri: emote.url,
                                 }} />
