@@ -7,6 +7,7 @@ export const createInitialState = () => {
         chatConfigs: new ChatConfigs(),
         chatClient: new ChatClient(),
         thirdPartyEmotes: new Map(),
+        badges: new Map(),
     }
 }
 
@@ -19,6 +20,8 @@ export const reducer = (state: any, action: AnyAction) => {
             emotes.set(action.channelID, action.emotes);
 
             return { ...state, thirdPartyEmotes: emotes }
+        case "SET_BADGES":
+            return { ...state, badges: action.badges }
         default:
             return { ...state };
     }
@@ -31,8 +34,24 @@ export type ThirdPartyEmote = {
     url: string;
 }
 
+export type BadgeContent = {
+    image_url_1x: string;
+    image_url_2x: string;
+    image_url_4x: string;
+    description: string;
+    title: string;
+    click_action: string;
+    click_url: string;
+    last_updated: string;
+}
+
+export type Badge = {
+    versions: Map<string, BadgeContent>
+}
+
 export interface Store {
     chatConfigs: ChatConfigs
     chatClient: ChatClient
     thirdPartyEmotes: ThirdPartyEmotes
+    badges: Map<string, Badge>
 }

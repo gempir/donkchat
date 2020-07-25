@@ -1,11 +1,11 @@
 import { PrivmsgMessage } from "dank-twitch-irc/dist/message/twitch-types/privmsg";
 import React from "react";
-import { Text } from "./Themed";
+import { Text, View } from "./Themed";
 import { connect } from "react-redux";
-import { Store, ThirdPartyEmotes } from "./../store/store";
-import {Image} from "react-native";
+import { Store, ThirdPartyEmotes, Badge } from "./../store/store";
+import { Image } from "react-native";
 
-class ChatMessage extends React.Component<{ message: PrivmsgMessage, thirdPartyEmotes: ThirdPartyEmotes }> {
+class ChatMessage extends React.Component<{ message: PrivmsgMessage, thirdPartyEmotes: ThirdPartyEmotes, badges: Map<string, Badge> }> {
     render() {
         const msg = this.props.message;
         const renderMessage = [];
@@ -61,11 +61,24 @@ class ChatMessage extends React.Component<{ message: PrivmsgMessage, thirdPartyE
             }
         }
 
+        const badges: Array<React.ReactNode> = [];
 
+        for (const badge of msg.badges) {
+            badges.push(
+                <Image
+                    key={badge.name}
+                    style={{ width: 18, height: 18 }}
+                    source={{
+                        uri: this.props.badges.get(badge.name)?.versions.get(badge.version)?.image_url_1x,
+                    }}
+                />
+            );
+            badges.push(" ");
+        }
 
         return (
-            <Text>
-                <Text style={{ color: this.props.message.colorRaw || undefined, fontWeight: "bold" }}>{this.props.message.displayName}</Text>: {renderMessage}
+            <Text style={{ includeFontPadding: false }}>
+                {badges}<Text style={{ includeFontPadding: false, color: this.props.message.colorRaw || undefined, fontWeight: "bold" }}>{this.props.message.displayName}</Text>: {renderMessage}
             </Text>
         );
     }
@@ -73,4 +86,5 @@ class ChatMessage extends React.Component<{ message: PrivmsgMessage, thirdPartyE
 
 export default connect((state: Store) => ({
     thirdPartyEmotes: state.thirdPartyEmotes,
+    badges: state.badges,
 }))(ChatMessage);
