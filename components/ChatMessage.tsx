@@ -1,17 +1,17 @@
 import { PrivmsgMessage } from "dank-twitch-irc/dist/message/twitch-types/privmsg";
 import React from "react";
-import { Text, View } from "./Themed";
-import { connect } from "react-redux";
-import { Store, ThirdPartyEmotes, Badge } from "./../store/store";
 import { Image } from "react-native";
+import { connect } from "react-redux";
+import { Badges, Store, ThirdPartyEmotes } from "./../store/store";
+import { Text } from "./Themed";
 
-class ChatMessage extends React.Component<{ message: PrivmsgMessage, thirdPartyEmotes: ThirdPartyEmotes, badges: Map<string, Badge> }> {
+class ChatMessage extends React.Component<{ message: PrivmsgMessage, thirdPartyEmotes: ThirdPartyEmotes, badges: Badges }> {
 
     shouldComponentUpdate(nextProps: any) {
         if (nextProps.thirdPartyEmotes !== this.props.thirdPartyEmotes) {
             return false;
         }
-        if (nextProps.badges !== this.props.badges) {
+        if (!Object.is(nextProps.badges, this.props.badges)) {
             return false;
         }
 
@@ -81,7 +81,7 @@ class ChatMessage extends React.Component<{ message: PrivmsgMessage, thirdPartyE
                     key={badge.name}
                     style={{ width: 18, height: 18 }}
                     source={{
-                        uri: this.props.badges.get(badge.name)?.versions.get(badge.version)?.image_url_1x,
+                        uri: this.props.badges[msg.channelID]?.[badge.name]?.versions[badge.version]?.image_url_1x,
                     }}
                 />
             );

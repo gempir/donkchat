@@ -4,8 +4,9 @@ import { ChatConfigs } from "./../models/Configs";
 import ChatClient from "./../twitch/ChatClient";
 import TabViewContainer from "./TabViewContainer";
 import { loadGlobalBadges } from "../store/actions/loadBadges";
+import { Dispatch } from "redux";
 
-class Main extends React.Component<{ chatConfigs: ChatConfigs, chatClient: ChatClient, colorScheme: string, dispatch: React.Dispatch<object> }> {
+class Main extends React.Component<{ chatConfigs: ChatConfigs, chatClient: ChatClient, colorScheme: string, dispatch: Dispatch<any> }> {
     componentDidMount() {
         this.props.dispatch(loadGlobalBadges());
         try {

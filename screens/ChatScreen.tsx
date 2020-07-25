@@ -7,7 +7,7 @@ import { View } from '../components/Themed';
 import { ChatConfig } from '../models/Configs';
 import ChatMessage from "./../components/ChatMessage";
 import ChatClient from "./../twitch/ChatClient";
-import { ThirdPartyEmotes } from "../store/store";
+import { ThirdPartyEmotes, Badges } from "../store/store";
 import loadThirdPartyEmotes from "../store/actions/loadThirdPartyEmotes";
 import { loadChannelBadges } from "../store/actions/loadBadges";
 
@@ -16,6 +16,7 @@ interface IProps {
     chatConfig: ChatConfig;
     thirdPartyEmotes: ThirdPartyEmotes;
     dispatch: Dispatch<any>;
+    badges: Badges
 }
 
 interface IState {
@@ -42,6 +43,9 @@ class ChatScreen extends React.Component<IProps, IState> {
         if (msg.channelName === this.props.chatConfig.channel) {
             if (!this.props.thirdPartyEmotes.has(msg.channelID)) {
                 this.props.dispatch(loadThirdPartyEmotes(msg.channelID));
+            }
+
+            if (!this.props.badges[msg.channelID]) {
                 this.props.dispatch(loadChannelBadges(msg.channelID));
             }
 
@@ -76,5 +80,6 @@ export default connect((state: any) => {
     return {
         chatClient: state.chatClient,
         thirdPartyEmotes: state.thirdPartyEmotes,
+        badges: state.badges,
     };
 })(ChatScreen);

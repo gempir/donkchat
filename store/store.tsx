@@ -45,13 +45,20 @@ export type BadgeContent = {
     last_updated: string;
 }
 
+export type UserId = string;
+
 export type Badge = {
-    versions: Map<string, BadgeContent>
+    versions: { [key: string]: BadgeContent }
 }
+
+export type BadgeType = "global" | UserId;
+
+export type Badges = { [key: string]: { [badgeName: string]: Badge } };
 
 export interface Store {
     chatConfigs: ChatConfigs
     chatClient: ChatClient
     thirdPartyEmotes: ThirdPartyEmotes
-    badges: Map<string, Badge>
+    badges: Badges
 }
+

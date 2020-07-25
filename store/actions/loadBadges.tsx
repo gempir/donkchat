@@ -1,5 +1,5 @@
 import { Dispatch } from "react";
-import { Store, Badge } from "../store";
+import { Store, Badge, Badges } from "../store";
 
 export function loadGlobalBadges() {
     return function (dispatch: Dispatch<object>, getState: (value: void) => Store) {
@@ -14,29 +14,37 @@ export function loadGlobalBadges() {
             }).then((response) => {
                 return response.json();
             }).then((json) => {
-                updateBadges(json, getState, dispatch, resolve);
+                updateBadges(json, getState, dispatch, resolve, "global");
             }).catch(reject);
         });
     };
 }
 
-function updateBadges(json: any, getState: (value: void) => Store, dispatch: Dispatch<object>, resolve: any) {
-    const badges: Map<string, Badge> = getState().badges;
-    for (const [name, emoteData] of Object.entries(json.badge_sets)) {
+function updateBadges(json: any, getState: (value: void) => Store, dispatch: Dispatch<object>, resolve: any, badgeType: string) {
+    const badges: Badges = getState().badges;
+
+    const newBadges: Badges = { [badgeType]: { ...badges["global"] } };
+
+    for (const [name, badgeData] of Object.entries(json.badge_sets)) {
         const badge: Badge = {
-            versions: new Map(),
+            versions: {},
         };
 
-        for (const [versionName, versionData] of Object.entries(emoteData.versions)) {
-            badge.versions.set(versionName, versionData);
+        // @ts-ignore
+        for (const [versionName, versionData] of Object.entries(badgeData.versions)) {
+            // @ts-ignore
+            badge.versions[versionName] = versionData;
         }
 
-        badges.set(name, badge);
+        if (!newBadges[badgeType]) {
+            newBadges[badgeType] = {};
+        }
+        newBadges[badgeType][name] = badge;
     }
 
     dispatch({
         type: "SET_BADGES",
-        badges: new Map(badges),
+        badges: newBadges,
     });
 
     resolve();
@@ -55,7 +63,7 @@ export function loadChannelBadges(channelID: string) {
             }).then((response) => {
                 return response.json();
             }).then((json) => {
-                updateBadges(json, getState, dispatch, resolve);
+                updateBadges(json, getState, dispatch, resolve, channelID);
             }).catch(reject);
         });
     };
