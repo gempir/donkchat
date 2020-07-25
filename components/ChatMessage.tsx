@@ -6,6 +6,18 @@ import { Store, ThirdPartyEmotes, Badge } from "./../store/store";
 import { Image } from "react-native";
 
 class ChatMessage extends React.Component<{ message: PrivmsgMessage, thirdPartyEmotes: ThirdPartyEmotes, badges: Map<string, Badge> }> {
+
+    shouldComponentUpdate(nextProps: any) {
+        if (nextProps.thirdPartyEmotes !== this.props.thirdPartyEmotes) {
+            return false;
+        }
+        if (nextProps.badges !== this.props.badges) {
+            return false;
+        }
+
+        return true;
+    }
+
     render() {
         const msg = this.props.message;
         const renderMessage = [];

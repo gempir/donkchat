@@ -45,7 +45,7 @@ export default function (channelID: string) {
                 for (const emote of ffzEmotes) {
                     emotes.push({
                         code: emote.name,
-                        url: emote.urls[1]
+                        url: emote.urls[1].replace("//cdn.frankerfacez.com", "https://cdn.frankerfacez.com")
                     });
                 }
 
