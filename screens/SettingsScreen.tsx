@@ -6,8 +6,9 @@ import { Dispatch } from "redux";
 import { Text, useThemeColor, View } from "../components/Themed";
 import ThemedButton from '../components/ThemedButton';
 import { ChatConfig, ChatConfigs } from "../models/Configs";
-import addChat from "../store/actions/addChat";
-import setConfigs from "../store/actions/setConfigs";
+import { addChat } from "../store/actions/Configs";
+import { setConfigs } from "../store/actions/Configs";
+import { Keyboard } from 'react-native';
 
 interface IProps {
     dispatch: Dispatch
@@ -64,20 +65,17 @@ class SettingsScreen extends React.Component<IProps, IState> {
 
     removeChannel = async (cfg: ChatConfig) => {
         try {
-            const jsonValue = await AsyncStorage.getItem('@chatConfigs')
-            const result = jsonValue != null ? JSON.parse(jsonValue) : [];
-            if (result && result.configs) {
-                const toSave = [];
-                for (const config of Object.values(result.configs)) {
-                    // @ts-ignore
-                    if (config.channel !== cfg.channel) {
-                        toSave.push(config);
-                    }
-                }
+            const toSave = [];
+            for (const config of this.props.chatConfigs.toArray()) {
                 // @ts-ignore
-                this.props.dispatch(setConfigs(new ChatConfigs(toSave)));
-                await AsyncStorage.setItem("@chatConfigs", JSON.stringify(toSave));
+                if (config.channel !== cfg.channel) {
+                    toSave.push(config);
+                }
             }
+            // @ts-ignore
+            const cfgs = new ChatConfigs(toSave);
+            this.props.dispatch(setConfigs(cfgs));
+            await AsyncStorage.setItem("@chatConfigs", JSON.stringify(cfgs));
         } catch (err) {
             console.log(err);
         }
@@ -85,21 +83,21 @@ class SettingsScreen extends React.Component<IProps, IState> {
 
     getConfigs = async () => {
         try {
-            // await AsyncStorage.removeItem('@chatConfigs')
             const jsonValue = await AsyncStorage.getItem('@chatConfigs')
-            const result = jsonValue != null ? JSON.parse(jsonValue) : [];
-            if (result && result.configs) {
-                return new ChatConfigs(Object.values(result.configs));
-            } else {
-                return new ChatConfigs();
+            const configs = jsonValue != null ? JSON.parse(jsonValue) : null;
+
+            let input: Array<ChatConfig> = [];
+            if (typeof configs.configs === "object") {
+                input = Object.values(configs.configs);
             }
+
+            return new ChatConfigs(input);
         } catch (e) {
             console.error(e);
 
             return new ChatConfigs();
         }
     }
-
 
     addChannel = () => {
         if (this.state.addChannel === "") {
@@ -113,6 +111,8 @@ class SettingsScreen extends React.Component<IProps, IState> {
         this.setState({
             addChannel: "",
         });
+
+        Keyboard.dismiss();
     }
 
     handleAddChannelChange = (text: string) => {

@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import { Dispatch } from "react";
 import { ChatConfig, ChatConfigs } from "../../models/Configs";
-import { Store } from "./../store";
+import { Store } from "../store";
 
-export default (cfg: ChatConfig): any => (dispatch: Dispatch<object>, getState: (value: void) => Store) => {
+export const addChat = (cfg: ChatConfig): any => (dispatch: Dispatch<object>, getState: (value: void) => Store) => {
     const cfgs = getState().chatConfigs.createNewWith(cfg);
     const chatClient = getState().chatClient;
     chatClient.join(cfg.channel);
@@ -12,13 +12,22 @@ export default (cfg: ChatConfig): any => (dispatch: Dispatch<object>, getState: 
         type: 'SET_CFGS',
         chatConfigs: cfgs
     });
-    save(cfgs);
+    persistConfig(cfgs);
 }
 
-const save = async (cfgs: ChatConfigs) => {
+export const setConfigs = (cfgs: ChatConfigs): any => (dispatch: Dispatch<object>) => {
+    dispatch({
+        type: 'SET_CFGS',
+        chatConfigs: cfgs
+    });
+
+    persistConfig(cfgs);
+}
+
+const persistConfig = async (cfgs: ChatConfigs) => {
     try {
         await AsyncStorage.setItem("@chatConfigs", JSON.stringify(cfgs))
     } catch (e) {
         console.error(e);
     }
-}
+};

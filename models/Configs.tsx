@@ -17,6 +17,7 @@ export class ChatConfigs {
         }
     }
 
+    //@ts-ignore
     get length() {
         return Object.values(this.configs).length;
     }
