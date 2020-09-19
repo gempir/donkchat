@@ -7,16 +7,11 @@ import { View } from '../components/Themed';
 import { ChatConfig } from '../models/Configs';
 import ChatMessage from "./../components/ChatMessage";
 import ChatClient from "./../twitch/ChatClient";
-import { ThirdPartyEmotes, Badges } from "../store/store";
-import loadThirdPartyEmotes from "../store/actions/loadThirdPartyEmotes";
-import { loadChannelBadges } from "../store/actions/loadBadges";
 
 interface IProps {
     chatClient: ChatClient;
     chatConfig: ChatConfig;
-    thirdPartyEmotes: ThirdPartyEmotes;
     dispatch: Dispatch<any>;
-    badges: Badges
 }
 
 interface IState {
@@ -41,14 +36,6 @@ class ChatScreen extends React.Component<IProps, IState> {
 
     handleMessage = (msg: PrivmsgMessage) => {
         if (msg.channelName === this.props.chatConfig.channel) {
-            if (!this.props.thirdPartyEmotes.has(msg.channelID)) {
-                this.props.dispatch(loadThirdPartyEmotes(msg.channelID));
-            }
-
-            if (!this.props.badges[msg.channelID]) {
-                this.props.dispatch(loadChannelBadges(msg.channelID));
-            }
-
             const newBuffer: Array<PrivmsgMessage> = this.state.buffer.slice();
             if (newBuffer.length >= this.BUFFER_LIMIT) {
                 newBuffer.pop();

@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import { Dispatch } from "react";
 import { ChatConfig, ChatConfigs } from "../../models/Configs";
-import { Store } from "../store";
+import { ReduxStore } from '../store';
 
-export const addChat = (cfg: ChatConfig): any => (dispatch: Dispatch<object>, getState: (value: void) => Store) => {
+export const addChat = (cfg: ChatConfig): any => (dispatch: Dispatch<object>, getState: (value: void) => ReduxStore) => {
     const cfgs = getState().chatConfigs.createNewWith(cfg);
     const chatClient = getState().chatClient;
     chatClient.join(cfg.channel);
