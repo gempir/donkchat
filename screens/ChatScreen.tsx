@@ -36,14 +36,14 @@ class ChatScreen extends React.Component<IProps, IState> {
 
     handleMessage = (msg: PrivmsgMessage) => {
         if (msg.channelName === this.props.chatConfig.channel) {
-            const newBuffer: Array<PrivmsgMessage> = this.state.buffer.slice();
-            if (newBuffer.length >= this.BUFFER_LIMIT) {
-                newBuffer.pop();
-            }
-            newBuffer.unshift(msg);
-            this.setState({
-                buffer: newBuffer,
-            });
+            // const newBuffer: Array<PrivmsgMessage> = this.state.buffer.slice();
+            // if (newBuffer.length >= this.BUFFER_LIMIT) {
+            //     newBuffer.pop();
+            // }
+            // newBuffer.unshift(msg);
+            // this.setState({
+            //     buffer: newBuffer,
+            // });
         }
     }
 

@@ -3,6 +3,7 @@ import { Dimensions } from "react-native";
 import { TabBar, TabView } from 'react-native-tab-view';
 import { useSelector } from "react-redux";
 import { useThemeColor } from "../components/Themed";
+import usePersistedConfigs from "../hooks/usePersistedConfigs";
 import ChatScreen from "../screens/ChatScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import { ReduxStore } from "../store/store";
@@ -23,10 +24,12 @@ const ThemedTabBar = (props: any) => {
 }
 
 export default (props: any) => {
+    usePersistedConfigs();
+
     const chatClient = useSelector((state: ReduxStore) => state.chatClient);
     React.useEffect(() => {
         try {
-            // chatClient.connect();
+            chatClient.connect();
         } catch (err) {
             console.log(err);
         }

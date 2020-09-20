@@ -8,11 +8,7 @@ export const addChat = (cfg: ChatConfig): any => (dispatch: Dispatch<object>, ge
     const chatClient = getState().chatClient;
     chatClient.join(cfg.channel);
 
-    dispatch({
-        type: 'SET_CFGS',
-        chatConfigs: cfgs
-    });
-    persistConfig(cfgs);
+    dispatch(setConfigs(cfgs));
 }
 
 export const setConfigs = (cfgs: ChatConfigs): any => (dispatch: Dispatch<object>) => {

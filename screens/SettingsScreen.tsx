@@ -1,130 +1,31 @@
-import AsyncStorage from '@react-native-community/async-storage';
-import React from "react";
+import React, { useState } from "react";
 import { TextInput } from "react-native";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
-import { Text, useThemeColor, View } from "../components/Themed";
+import { useDispatch } from "react-redux";
+import { useThemeColor, View } from "../components/Themed";
 import ThemedButton from '../components/ThemedButton';
-import { ChatConfig, ChatConfigs } from "../models/Configs";
+import { ChatConfig } from "../models/Configs";
 import { addChat } from "../store/actions/Configs";
-import { setConfigs } from "../store/actions/Configs";
-import { Keyboard } from 'react-native';
 
-interface IProps {
-    dispatch: Dispatch
-    chatClient: any
-    chatConfigs: ChatConfigs
+export default () => {
+    const [channel, setChannel] = useState("");
+
+    const dispatch = useDispatch();
+    const addChannel = () => {
+        dispatch(addChat(new ChatConfig(channel)));
+        setChannel("");
+    }
+
+    return <View style={{ height: "100%" }}>
+        <View style={{ flexDirection: 'row', padding: 20, alignItems: 'stretch' }}>
+            <TextInput placeholder="channel" autoCorrect={false} onChangeText={setChannel} style={{
+                borderColor: 'gray',
+                width: "80%",
+                borderWidth: 1,
+                padding: 10,
+                marginRight: 10,
+                color: useThemeColor("text")
+            }} value={channel} />
+            <ThemedButton style={{ width: "20%" }} onPress={addChannel}>Add</ThemedButton>
+        </View>
+    </View>
 }
-
-interface IState {
-    addChannel: string,
-}
-
-const Input = (props: any) => {
-    return (
-        <TextInput placeholder="channel" autoCorrect={false} onChangeText={props.handleAddChannelChange} style={{
-            borderColor: 'gray',
-            width: "80%",
-            borderWidth: 1,
-            padding: 10,
-            marginRight: 10,
-            color: useThemeColor("text")
-        }} value={props.addChannel} />
-    )
-}
-
-class SettingsScreen extends React.Component<IProps, IState> {
-    state = {
-        addChannel: "",
-    }
-
-    render() {
-        return <View style={{ flex: 1 }}>
-            <View style={{ flexDirection: 'row', padding: 20, alignItems: 'stretch' }}>
-                <Input addChannel={this.state.addChannel} handleAddChannelChange={this.handleAddChannelChange} />
-                <ThemedButton style={{ width: "20%" }} onPress={this.addChannel}>Add</ThemedButton>
-            </View>
-            <View style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 20 }}>
-                <Text>Click channel to remove</Text>
-            </View>
-            <View style={{ flexDirection: 'row', padding: 10, paddingTop: 10, alignItems: 'stretch' }}>
-                {this.props.chatConfigs.toArray().map(cfg => <ThemedButton style={{ height: 40, marginRight: 10, marginLeft: 10 }} key={cfg.channel} onPress={() => this.removeChannel(cfg)}>{cfg.channel}</ThemedButton>)}
-            </View>
-        </View>;
-    }
-
-    componentDidMount() {
-        this.getConfigs().then(cfgs => {
-            for (const cfg of cfgs.toArray()) {
-                this.props.chatClient.join(cfg.channel);
-            }
-
-            this.props.dispatch(setConfigs(cfgs));
-        });
-    }
-
-    removeChannel = async (cfg: ChatConfig) => {
-        try {
-            const toSave = [];
-            for (const config of this.props.chatConfigs.toArray()) {
-                // @ts-ignore
-                if (config.channel !== cfg.channel) {
-                    toSave.push(config);
-                }
-            }
-            // @ts-ignore
-            const cfgs = new ChatConfigs(toSave);
-            this.props.dispatch(setConfigs(cfgs));
-            await AsyncStorage.setItem("@chatConfigs", JSON.stringify(cfgs));
-        } catch (err) {
-            console.log(err);
-        }
-    }
-
-    getConfigs = async () => {
-        try {
-            const jsonValue = await AsyncStorage.getItem('@chatConfigs')
-            const configs = jsonValue != null ? JSON.parse(jsonValue) : null;
-
-            let input: Array<ChatConfig> = [];
-            if (typeof configs.configs === "object") {
-                input = Object.values(configs.configs);
-            }
-
-            return new ChatConfigs(input);
-        } catch (e) {
-            console.error(e);
-
-            return new ChatConfigs();
-        }
-    }
-
-    addChannel = () => {
-        if (this.state.addChannel === "") {
-            return;
-        }
-
-        const cfg = new ChatConfig(this.state.addChannel);
-
-        this.props.dispatch(addChat(cfg));
-
-        this.setState({
-            addChannel: "",
-        });
-
-        Keyboard.dismiss();
-    }
-
-    handleAddChannelChange = (text: string) => {
-        this.setState({
-            addChannel: text,
-        });
-    }
-}
-
-export default connect((state: any) => {
-    return {
-        chatClient: state.chatClient,
-        chatConfigs: state.chatConfigs,
-    };
-})(SettingsScreen);
