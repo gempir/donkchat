@@ -9,6 +9,7 @@ export default class ChatClient {
     eventHandlers: Map<string, EventHandler> = new Map();
     msgQueue: Array<string> = [];
     joinedChannels: Array<string> = [];
+    connected: boolean = false;
 
     addEventHandler = (handler: EventHandler) => {
         const handlerId = Math.random().toString(36).substring(7);
@@ -35,6 +36,7 @@ export default class ChatClient {
         console.log("open ws");
         this.send("CAP REQ :twitch.tv/commands twitch.tv/tags");
         this.send("NICK justinfan123123");
+        this.connected = true;
 
         for (const msg of this.msgQueue) {
             this.send(msg);
@@ -71,16 +73,18 @@ export default class ChatClient {
 
     onError = (event: Event) => {
         console.log(event);
+        this.connected = false;
         this.connect();
     };
 
     onClose = (event: WebSocketCloseEvent) => {
         console.log(event);
+        this.connected = false;
         this.connect();
     };
 
     send = (message: string) => {
-        if (typeof this.ws === "undefined") {
+        if (typeof this.ws === "undefined" || !this.connected) {
             this.msgQueue.push(message);
             return false;
         }
@@ -89,7 +93,7 @@ export default class ChatClient {
             this.ws.send(message);
             return true;
         } catch (err) {
-            this.msgQueue.push(message);
+            console.error(err);
             return false;
         }
     };

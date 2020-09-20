@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, {useEffect} from "react";
 import { Dimensions } from "react-native";
 import { TabBar, TabView } from 'react-native-tab-view';
 import { useSelector } from "react-redux";
@@ -27,13 +27,13 @@ export default (props: any) => {
     usePersistedConfigs();
 
     const chatClient = useSelector((state: ReduxStore) => state.chatClient);
-    React.useEffect(() => {
+    useEffect(() => {
         try {
             chatClient.connect();
         } catch (err) {
             console.log(err);
         }
-    })
+    }, []);
 
 
     const [index, setIndex] = React.useState(0);
@@ -46,7 +46,7 @@ export default (props: any) => {
     }
     routes.push({ key: 'settings', title: 'Settings' });
 
-    const renderScene = ({ route, jumpTo }: { route: route, jumpTo: (key: string) => void }) => {
+    const renderScene = ({ route }: { route: route }) => {
         if (route.key === "settings") {
             return <SettingsScreen />
         }
