@@ -24,6 +24,7 @@ export default (props: IProps) => {
             }
             newBuffer.unshift(msg);
             setBuffer(newBuffer);
+            console.log(newBuffer);
         }
     }
  

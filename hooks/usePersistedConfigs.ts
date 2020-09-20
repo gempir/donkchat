@@ -1,10 +1,13 @@
 import { useEffect } from "react";
 import { AsyncStorage } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ChatConfig, ChatConfigs } from "../models/Configs";
+import { ReduxStore } from "../store/store";
 
 export default () => {
     const dispatch = useDispatch();
+
+    const chatClient = useSelector((state: ReduxStore) => state.chatClient);
 
     useEffect(() => {
         try {
@@ -16,10 +19,15 @@ export default () => {
                     input = Object.values(configs.configs);
                 }
     
+                const cfgs = new ChatConfigs(input);
                 dispatch({
                     type: 'SET_CFGS',
-                    chatConfigs: new ChatConfigs(input)
+                    chatConfigs: cfgs,
                 });
+
+                for (const cfg of cfgs.toArray()) {
+                    chatClient.join(cfg.channel);
+                }
             })
     
         } catch (e) {

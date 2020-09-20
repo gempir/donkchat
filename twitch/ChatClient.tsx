@@ -47,6 +47,7 @@ export default class ChatClient {
     };
 
     join = (channel: string) => {
+        console.log("Joining", channel);
         const sent = this.send(`JOIN #${channel}`);
 
         if (sent) {
@@ -56,6 +57,7 @@ export default class ChatClient {
 
     onMessage = (message: MessageEvent) => {
         try {
+            console.log(message.data);
             const msg = parseTwitchMessage(message.data);
 
             if (msg instanceof PrivmsgMessage) {
