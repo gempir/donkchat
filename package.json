@@ -6,7 +6,8 @@
         "ios": "expo start --ios",
         "web": "expo start --web",
         "eject": "expo eject",
-        "test": "jest --watchAll"
+        "test": "jest --watchAll",
+        "audit:fix": "npx yarn-audit-fix"
     },
     "jest": {
         "preset": "jest-expo"
@@ -16,7 +17,7 @@
         "@react-native-community/async-storage": "^1.11.0",
         "@react-native-community/masked-view": "0.1.10",
         "@types/react-redux": "^7.1.9",
-        "dank-twitch-irc": "^3.3.0",
+        "dank-twitch-irc": "^4.0.0",
         "expo": "~38.0.8",
         "expo-asset": "~8.1.7",
         "expo-constants": "~9.1.1",
